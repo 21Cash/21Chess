@@ -47,8 +47,11 @@ const Game = () => {
       return;
 
     const randomIndex = Math.floor(Math.random() * possibleMoves.length);
+
     safeGameMutate((game) => {
-      game.move(possibleMoves[randomIndex]);
+      const moveToMake = possibleMoves[randomIndex];
+      console.log(game.history());
+      game.move(moveToMake);
     });
   }
 
