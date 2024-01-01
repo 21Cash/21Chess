@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
-import { SocketContext } from "../Context";
+import { GameContext, SocketContext } from "../Context";
 import { UserContext } from "../Context";
+import { useNavigate } from "react-router-dom";
 
 const getTimeData = (format) => {
   const timeData = {};
@@ -23,7 +24,9 @@ const CreateGame = () => {
   const [targetOpponent, setTargetOpponent] = useState("");
 
   const { socket } = useContext(SocketContext);
-  const { username, setUsername } = useContext(UserContext);
+  const { gameContext, setGameContext } = useContext(GameContext);
+
+  const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission here
@@ -36,6 +39,28 @@ const CreateGame = () => {
       targetOpponent: targetOpponent,
     };
     socket.emit("createGame", gameData);
+
+    socket.on("gameCreated", (gameInfo) => {
+      /*
+       const gameInfo = {
+        creator: username,
+        isPublic: isPublic,
+        showEval: showEval,
+        totalTime: totalTime,
+        timeIncrement: timeIncrement,
+        targetOpponent: targetOpponent,
+        gameString: gameString,
+      };
+      */
+      const { gameString, showEval } = gameInfo;
+      setGameContext({
+        ...gameContext,
+        myColor: gameInfo.creatorColor,
+        showEval,
+      });
+      console.log(gameContext);
+      navigate(`/Game/${gameString}`);
+    });
   };
 
   return (

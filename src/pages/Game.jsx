@@ -1,6 +1,7 @@
-import React, { forwardRef, useEffect, useRef, useState, useMemo } from "react";
+import React, { useState, useRef, useContext, useEffect } from "react";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
+import { GameContext } from "../Context";
 
 const buttonStyle = {
   cursor: "pointer",
@@ -25,53 +26,49 @@ const boardWrapper = {
   maxWidth: "70vh",
   margin: "3rem auto",
 };
-
 const Game = () => {
   const [game, setGame] = useState(new Chess());
-  const [currentTimeout, setCurrentTimeout] = useState();
+  const [opponentMoveInput, setOpponentMoveInput] = useState("");
   const chessboardRef = useRef(null);
+  const { gameContext } = useContext(GameContext);
+  const myColor = gameContext.myColor;
 
-  function safeGameMutate(modify) {
+  const safeGameMutate = (modify) => {
     setGame((g) => {
       const update = { ...g };
       modify(update);
       return update;
     });
-  }
+  };
 
-  function makeRandomMove() {
-    const possibleMoves = game.moves();
-
-    // exit if the game is over
-    if (game.game_over() || game.in_draw() || possibleMoves.length === 0)
-      return;
-
-    const randomIndex = Math.floor(Math.random() * possibleMoves.length);
+  const handleOpponentMoveInput = () => {
+    const opponentMove = opponentMoveInput.trim();
 
     safeGameMutate((game) => {
-      const moveToMake = possibleMoves[randomIndex];
-      console.log(game.history());
-      game.move(moveToMake);
+      const move = game.move(opponentMove);
+      if (move !== null) {
+        // Handle valid move
+      } else {
+        console.log("Invalid move");
+      }
     });
-  }
 
-  function onDrop(sourceSquare, targetSquare, piece) {
+    setOpponentMoveInput("");
+  };
+
+  const onDrop = (sourceSquare, targetSquare, piece) => {
     const gameCopy = { ...game };
     const move = gameCopy.move({
       from: sourceSquare,
       to: targetSquare,
-      promotion: piece[1].toLowerCase() ?? "q",
+      promotion: piece[1]?.toLowerCase() ?? "q",
     });
     setGame(gameCopy);
 
-    // illegal move
     if (move === null) return false;
 
-    // store timeout so it can be cleared on undo/reset so computer doesn't execute move
-    const newTimeout = setTimeout(makeRandomMove, 2000);
-    setCurrentTimeout(newTimeout);
     return true;
-  }
+  };
 
   return (
     <div style={boardWrapper}>
@@ -79,7 +76,7 @@ const Game = () => {
         id="PremovesEnabled"
         arePremovesAllowed={true}
         position={game.fen()}
-        isDraggablePiece={({ piece }) => piece[0] === "w"}
+        isDraggablePiece={({ piece }) => piece[0] === myColor[0]}
         onPieceDrop={onDrop}
         customBoardStyle={{
           borderRadius: "4px",
@@ -87,37 +84,19 @@ const Game = () => {
         }}
         ref={chessboardRef}
         allowDragOutsideBoard={false}
+        boardOrientation={myColor === "w" ? "white" : "black"}
       />
-      <button
-        style={buttonStyle}
-        onClick={() => {
-          safeGameMutate((game) => {
-            game.reset();
-          });
-          // clear premove queue
-          chessboardRef.current?.clearPremoves();
-          // stop any current timeouts
-          clearTimeout(currentTimeout);
-        }}
-      >
-        reset
+      <input
+        style={inputStyle}
+        type="text"
+        placeholder="Enter opponent's move"
+        value={opponentMoveInput}
+        onChange={(e) => setOpponentMoveInput(e.target.value)}
+      />
+      <button style={buttonStyle} onClick={handleOpponentMoveInput}>
+        Submit
       </button>
-      <button
-        style={buttonStyle}
-        onClick={() => {
-          // undo twice to undo computer move too
-          safeGameMutate((game) => {
-            game.undo();
-            game.undo();
-          });
-          // clear premove queue
-          chessboardRef.current?.clearPremoves();
-          // stop any current timeouts
-          clearTimeout(currentTimeout);
-        }}
-      >
-        undo
-      </button>
+      {/* Add other buttons if needed */}
     </div>
   );
 };

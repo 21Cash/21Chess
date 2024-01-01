@@ -30,8 +30,8 @@ function Navbar() {
               </Link>
             </li>
             <li>
-              <Link to="/about" className="text-gray-400 hover:text-gray-100">
-                About Us
+              <Link to="/Join" className="text-gray-400 hover:text-gray-100">
+                Join Game
               </Link>
             </li>
             <li>
