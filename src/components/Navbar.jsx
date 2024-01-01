@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { UserContext } from "../Context";
 
 function Button({ text, bg, padding }) {
   return (
@@ -16,12 +17,16 @@ function Button({ text, bg, padding }) {
 }
 
 function Navbar() {
+  const { username } = useContext(UserContext);
   return (
     <div className="fixed left-0 right-0 top-0 h-16 shadow-md border-b-2 border-gray-100 bg-gray-900">
       <nav className="flex items-center container mx-auto h-full justify-between">
-        <h1 className="font-semibold uppercase text-lg text-gray-200">
-          21Chess
-        </h1>
+        <Link to="/">
+          <h1 className="font-semibold uppercase text-2xl text-gray-200">
+            21Chess
+          </h1>
+        </Link>
+
         <div>
           <ul className="flex items-center space-x-10 text-sm">
             <li>
@@ -42,10 +47,12 @@ function Navbar() {
           </ul>
         </div>
         <div>
-          <Button
-            text="Login"
-            bg="bg-gradient-to-r from-purple-500 to-blue-500"
-          />
+          {username && (
+            <Button
+              text={username}
+              bg="bg-gradient-to-r from-purple-500 to-blue-500"
+            />
+          )}
         </div>
       </nav>
     </div>

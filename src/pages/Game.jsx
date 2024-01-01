@@ -1,7 +1,8 @@
 import React, { useState, useRef, useContext, useEffect } from "react";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
-import { GameContext, SocketContext } from "../Context";
+import { GameContext, SocketContext, UserContext } from "../Context";
+import soundEffect from "../media/Move.mp3";
 
 const buttonStyle = {
   cursor: "pointer",
@@ -31,8 +32,13 @@ const Game = () => {
   const [opponentMoveInput, setOpponentMoveInput] = useState("");
   const chessboardRef = useRef(null);
   const { socket } = useContext(SocketContext);
-  const { gameContext } = useContext(GameContext);
+  const { gameContext, setGameContext } = useContext(GameContext);
+  const { username } = useContext(UserContext);
+  const [moveSound] = useState(new Audio(soundEffect));
+
   const myColor = gameContext.myColor;
+  let canMakeMoves = false;
+  let opponentUsername;
 
   useEffect(() => {
     socket.on("moveMessage", (data) => {
@@ -50,6 +56,36 @@ const Game = () => {
         }
       });
       console.log(data);
+    });
+    socket.on("startGame", (gameData) => {
+      console.log("Game Started.");
+      const { whiteName, blackName } = gameData;
+      canMakeMoves = true;
+      let opponentName;
+      if (username == whiteName) {
+        opponentName = blackName;
+      } else opponentName = whiteName;
+      setGameContext({ ...gameContext, opponent: opponentName });
+      console.log(`Opponent : ${opponentName}`);
+      opponentUsername = opponentName;
+    });
+
+    socket.on("endGame", (resultData) => {
+      const { isDraw, winColor, winnerName } = resultData;
+
+      if (isDraw) {
+        setGameContext({
+          ...gameContext,
+          result: "Draw",
+          opponent: opponentUsername,
+        });
+      } else {
+        setGameContext({
+          ...gameContext,
+          result: `Checkmate, ${winnerName} Won`,
+          opponent: opponentUsername,
+        });
+      }
     });
   }, []);
 
@@ -95,7 +131,7 @@ const Game = () => {
       moveObj: move,
     };
     socket.emit("sendMove", moveData);
-    console.log(`Send Move Emitted With ${moveData}`);
+    moveSound.play();
     return true;
   };
 
@@ -114,8 +150,9 @@ const Game = () => {
         ref={chessboardRef}
         allowDragOutsideBoard={false}
         boardOrientation={myColor === "w" ? "white" : "black"}
+        animationDuration={200}
       />
-      <input
+      {/* <input
         style={inputStyle}
         type="text"
         placeholder="Enter opponent's move"
@@ -124,8 +161,7 @@ const Game = () => {
       />
       <button style={buttonStyle} onClick={handleOpponentMoveInput}>
         Submit
-      </button>
-      {/* Add other buttons if needed */}
+      </button> */}
     </div>
   );
 };

@@ -25,7 +25,7 @@ const EnterBox = () => {
   };
 
   return (
-    <div className="bg-gray-900 text-white p-6 rounded-lg shadow-md">
+    <div className="bg-gray-900 text-white p-10 m-1 rounded-lg shadow-md">
       <h1 className="text-3xl font-bold mb-4">Enter</h1>
       <div className="mb-4">
         <label htmlFor="name" className="block mb-1">

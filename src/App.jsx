@@ -9,6 +9,7 @@ import { SocketContext, UserContext, GameContext } from "./Context";
 import { backendUrl } from "../Constants";
 import EnterPage from "./pages/EnterPage";
 import JoinGame from "./components/JoinGame";
+import Popup from "./components/Popup";
 
 function App() {
   const [socket, setSocket] = useState(null);
@@ -16,7 +17,16 @@ function App() {
   const [gameContext, setGameContext] = useState({
     myColor: "w",
     gameString: "",
+    result: "",
+    opponent: "",
   });
+
+  const handleClosePopup = () => {
+    setGameContext({
+      ...gameContext,
+      result: "", // Reset the result when closing the popup
+    });
+  };
 
   useEffect(() => {
     console.log(`Trying To Connect To Server : ${backendUrl}`);
@@ -49,6 +59,9 @@ function App() {
               </Routes>
             </div>
           </Router>
+          {gameContext.result !== "" && (
+            <Popup handleClose={handleClosePopup} />
+          )}
         </GameContext.Provider>
       </SocketContext.Provider>
     </UserContext.Provider>
