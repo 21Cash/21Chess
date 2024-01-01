@@ -57,6 +57,7 @@ const CreateGame = () => {
         ...gameContext,
         myColor: gameInfo.creatorColor,
         showEval,
+        gameString: gameInfo.gameString,
       });
       console.log(gameContext);
       navigate(`/Game/${gameString}`);

@@ -1,14 +1,24 @@
 import React, { useContext, useEffect, useState } from "react";
-import { SocketContext } from "../Context";
+import { GameContext, SocketContext } from "../Context";
+import { useNavigate } from "react-router-dom";
 
 const JoinGame = () => {
   const [inputValue, setInputValue] = useState("");
   const { socket } = useContext(SocketContext);
+  const { gameContext, setGameContext } = useContext(GameContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     socket.on("gameJoined", (gameData) => {
       console.log("Game Join Successful");
       console.log(gameData);
+      setGameContext({
+        ...gameContext,
+        myColor: gameData.myColor,
+        gameString: gameData.gameString,
+        showEval: gameData.showEval,
+      });
+      navigate(`/Game/${gameData.gameString}`);
     });
 
     socket.on("gameJoinFailed", (info) => {

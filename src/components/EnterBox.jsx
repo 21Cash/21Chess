@@ -9,8 +9,6 @@ const EnterBox = () => {
   const { username, setUsername } = useContext(UserContext);
   const navigate = useNavigate();
   const handleEnter = () => {
-    console.log(socket);
-    console.log(socket.id);
     const userData = { username: name };
     socket.emit("registerUser", userData);
 

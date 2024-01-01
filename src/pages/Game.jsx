@@ -1,7 +1,7 @@
 import React, { useState, useRef, useContext, useEffect } from "react";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
-import { GameContext } from "../Context";
+import { GameContext, SocketContext } from "../Context";
 
 const buttonStyle = {
   cursor: "pointer",
@@ -30,8 +30,28 @@ const Game = () => {
   const [game, setGame] = useState(new Chess());
   const [opponentMoveInput, setOpponentMoveInput] = useState("");
   const chessboardRef = useRef(null);
+  const { socket } = useContext(SocketContext);
   const { gameContext } = useContext(GameContext);
   const myColor = gameContext.myColor;
+
+  useEffect(() => {
+    socket.on("moveMessage", (data) => {
+      const { senderId, gameString, senderName, color, moveObj } = data;
+      console.log("Move received.");
+      if (senderId == socket.id) return; // Ignore self Moves
+
+      const opponentMove = moveObj;
+      safeGameMutate((game) => {
+        const move = game.move(opponentMove);
+        if (move !== null) {
+          // Handle valid move
+        } else {
+          console.log("Invalid move");
+        }
+      });
+      console.log(data);
+    });
+  }, []);
 
   const safeGameMutate = (modify) => {
     setGame((g) => {
@@ -66,7 +86,16 @@ const Game = () => {
     setGame(gameCopy);
 
     if (move === null) return false;
+    console.log(move);
 
+    //  const { gameString, moveString, color } = moveData;
+    const moveData = {
+      gameString: gameContext.gameString,
+      color: myColor,
+      moveObj: move,
+    };
+    socket.emit("sendMove", moveData);
+    console.log(`Send Move Emitted With ${moveData}`);
     return true;
   };
 

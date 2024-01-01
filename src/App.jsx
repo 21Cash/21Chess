@@ -13,7 +13,10 @@ import JoinGame from "./components/JoinGame";
 function App() {
   const [socket, setSocket] = useState(null);
   const [username, setUsername] = useState("");
-  const [gameContext, setGameContext] = useState({ myColor: "w" });
+  const [gameContext, setGameContext] = useState({
+    myColor: "w",
+    gameString: "",
+  });
 
   useEffect(() => {
     console.log(`Trying To Connect To Server : ${backendUrl}`);
