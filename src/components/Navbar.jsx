@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { UserContext } from "../Context";
+import { SocketContext, UserContext } from "../Context";
+import { useNavigate } from "react-router-dom";
 
 function Button({ text, bg, padding }) {
   return (
@@ -17,31 +18,50 @@ function Button({ text, bg, padding }) {
 }
 
 function Navbar() {
-  const { username } = useContext(UserContext);
+  const { username, setUsername } = useContext(UserContext);
+  const { socket } = useContext(SocketContext);
+
+  const navigate = useNavigate();
+
+  const goEnterPage = () => {
+    socket.disconnect();
+    setUsername("");
+    navigate("/");
+  };
+
   return (
     <div className="fixed left-0 right-0 top-0 h-16 shadow-md border-b-2 border-gray-100 bg-gray-900">
       <nav className="flex items-center container mx-auto h-full justify-between">
-        <Link to="/Home">
-          <h1 className="font-semibold uppercase text-2xl text-gray-200">
+        <button to="/" onClick={goEnterPage}>
+          <h1 className="font-semibold uppercase text-2xl hover:text-blue-500 transition duration-300 ease-in-out text-gray-200">
             21Chess
           </h1>
-        </Link>
+        </button>
 
         <div>
           <ul className="flex items-center space-x-10 text-sm">
             <li>
-              <Link to="/Home" className="text-gray-400 hover:text-gray-100">
+              <Link
+                to="/Home"
+                className="text-gray-400 hover:text-gray-100 transition duration-300 ease-in-out"
+              >
                 Home
               </Link>
             </li>
             <li>
-              <Link to="/Join" className="text-gray-400 hover:text-gray-100">
+              <Link
+                to="/Join"
+                className="text-gray-400 transition duration-300 ease-in-out hover:text-gray-100"
+              >
                 Join Game
               </Link>
             </li>
             <li>
-              <Link to="/docs" className="text-gray-400 hover:text-gray-100">
-                Docs
+              <Link
+                to="/docs"
+                className="text-gray-400 transition duration-300 ease-in-out hover:text-gray-100"
+              >
+                About
               </Link>
             </li>
           </ul>

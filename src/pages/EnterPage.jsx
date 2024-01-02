@@ -40,17 +40,6 @@ const EnterPage = () => {
     fetchData();
   }, []);
 
-  const checkServerStatus = () => {
-    setLoading(true);
-    setTimeout(() => {
-      const isOnline = Math.random() < 0.8;
-      setServerStatus(isOnline ? "Online" : "Offline");
-      setPlayersOnline(isOnline ? Math.floor(Math.random() * 100) : 0);
-      setLoading(false);
-      setError(false);
-    }, 2000);
-  };
-
   const handleEnter = () => {
     const userData = { username: name };
     socket.emit("registerUser", userData);
@@ -86,7 +75,7 @@ const EnterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col justify-between">
+    <div className="h-screen bg-gray-900 text-white flex flex-col justify-between pt-20">
       {loading ? (
         <div className="flex items-center justify-center h-screen">
           <p className="text-4xl">Loading...</p>
@@ -123,12 +112,6 @@ const EnterPage = () => {
           <div className="text-center">
             <p>Server Status: {serverStatus}</p>
             <p>{playersOnline} players Online</p>
-            <button
-              onClick={checkServerStatus}
-              className="bg-gray-700 text-white px-3 py-2 rounded mt-4 hover:bg-gray-600 transition duration-300"
-            >
-              Check Status
-            </button>
           </div>
         </div>
       )}
@@ -138,7 +121,7 @@ const EnterPage = () => {
           &#169; {new Date().getFullYear()} 21Chess. Made with &#10084;&#65039;
           by 21Cash.{" "}
           <a
-            href="https://link-to-source-code"
+            href="https://github.com/21Cash/21Chess"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 hover:underline"

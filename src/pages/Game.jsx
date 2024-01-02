@@ -168,7 +168,7 @@ const Game = () => {
       <div className="my-48 mx-10 flex-1 bg-gray-500 rounded-2xl p-4 flex flex-col justify-center items-center">
         <div className="text-gray-900  text-4xl font-bold mb-2">
           {/* Display opponent's name in big font */}
-          {gameContext.opponent}
+          {gameContext.opponent != "" ? gameContext.opponent : "Waiting..."}
         </div>
         <div className="text-sm mb-2">
           {/* Small 'vs' text */}

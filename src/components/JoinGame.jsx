@@ -43,21 +43,23 @@ const JoinGame = () => {
   };
 
   return (
-    <div className="dark:bg-gray-900 flex flex-col items-center justify-center min-h-screen">
-      <input
-        className="dark:bg-gray-800 shadow appearance-none border rounded py-2 px-3 text-gray-700 dark:text-gray-300 leading-tight focus:outline-none focus:shadow-outline"
-        type="text"
-        placeholder="Enter game code"
-        value={inputValue}
-        onChange={handleInputChange}
-        onKeyPress={handleKeyPress}
-      />
-      <button
-        className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        onClick={handleJoinClick}
-      >
-        Join
-      </button>
+    <div className="bg-gray-800 flex items-center justify-center min-h-screen">
+      <div className="bg-gray-900 p-8 rounded-lg shadow-md w-2/6 py-16">
+        <input
+          className="mb-4 w-full shadow appearance-none border rounded py-2 px-3 text-gray-700  leading-tight focus:outline-none focus:shadow-outline"
+          type="text"
+          placeholder="Enter game code"
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+        />
+        <button
+          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          onClick={handleJoinClick}
+        >
+          Join
+        </button>
+      </div>
     </div>
   );
 };
