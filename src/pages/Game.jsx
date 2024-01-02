@@ -55,6 +55,7 @@ const Game = () => {
           console.log("Invalid move");
         }
       });
+
       console.log(data);
     });
     socket.on("startGame", (gameData) => {
