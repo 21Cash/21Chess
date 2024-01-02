@@ -135,34 +135,50 @@ const Game = () => {
     moveSound.play();
     return true;
   };
-
   return (
-    <div className="pt-5" style={boardWrapper}>
-      <Chessboard
-        id="PremovesEnabled"
-        arePremovesAllowed={true}
-        position={game.fen()}
-        isDraggablePiece={({ piece }) => piece[0] === myColor[0]}
-        onPieceDrop={onDrop}
-        customBoardStyle={{
-          borderRadius: "4px",
-          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-        }}
-        ref={chessboardRef}
-        allowDragOutsideBoard={false}
-        boardOrientation={myColor === "w" ? "white" : "black"}
-        animationDuration={200}
-      />
-      {/* <input
-        style={inputStyle}
-        type="text"
-        placeholder="Enter opponent's move"
-        value={opponentMoveInput}
-        onChange={(e) => setOpponentMoveInput(e.target.value)}
-      />
-      <button style={buttonStyle} onClick={handleOpponentMoveInput}>
-        Submit
-      </button> */}
+    <div className="flex">
+      {/* Left div for chatbox */}
+
+      <div className="my-10 mx-5 flex-1 bg-gray-600 p-4">
+        {/* Chatbox content goes here */}
+      </div>
+
+      {/* Middle div for chessboard */}
+      <div className="flex-3 flex justify-center">
+        <div className="pt-5" style={boardWrapper}>
+          <Chessboard
+            id="PremovesEnabled"
+            arePremovesAllowed={true}
+            position={game.fen()}
+            isDraggablePiece={({ piece }) => piece[0] === myColor[0]}
+            onPieceDrop={onDrop}
+            customBoardStyle={{
+              borderRadius: "4px",
+              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+            }}
+            ref={chessboardRef}
+            allowDragOutsideBoard={false}
+            boardOrientation={myColor === "w" ? "white" : "black"}
+            animationDuration={200}
+          />
+        </div>
+      </div>
+
+      {/* Right div for game information */}
+      <div className="my-48 mx-10 flex-1 bg-gray-500 rounded-2xl p-4 flex flex-col justify-center items-center">
+        <div className="text-gray-900  text-4xl font-bold mb-2">
+          {/* Display opponent's name in big font */}
+          {gameContext.opponent}
+        </div>
+        <div className="text-sm mb-2">
+          {/* Small 'vs' text */}
+          vs
+        </div>
+        <div className="text-gray-900 text-4xl font-bold">
+          {/* Display username in big font */}
+          {username}
+        </div>
+      </div>
     </div>
   );
 };
