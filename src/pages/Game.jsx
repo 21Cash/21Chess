@@ -57,6 +57,7 @@ const Game = () => {
       });
 
       console.log(data);
+      moveSound.play();
     });
     socket.on("startGame", (gameData) => {
       console.log("Game Started.");
