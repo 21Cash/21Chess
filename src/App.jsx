@@ -47,7 +47,7 @@ function App() {
       <SocketContext.Provider value={{ socket, setSocket }}>
         <GameContext.Provider value={{ gameContext, setGameContext }}>
           <Router>
-            <div className="pt-10">
+            <div className="pt-10 bg-gray-700 h-screen">
               <Navbar />
               <Routes>
                 <Route path="/" element={<EnterPage />} />

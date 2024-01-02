@@ -23,8 +23,8 @@ const inputStyle = {
 };
 
 const boardWrapper = {
-  width: `70vw`,
-  maxWidth: "70vh",
+  width: `80vw`,
+  maxWidth: "80vh",
   margin: "3rem auto",
 };
 const Game = () => {
@@ -137,7 +137,7 @@ const Game = () => {
   };
 
   return (
-    <div style={boardWrapper}>
+    <div className="pt-5" style={boardWrapper}>
       <Chessboard
         id="PremovesEnabled"
         arePremovesAllowed={true}
