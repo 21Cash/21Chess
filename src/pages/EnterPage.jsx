@@ -10,7 +10,7 @@ const EnterPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [name, setName] = useState(""); // New state for the entered name
-  const { socket } = useContext(SocketContext);
+  let { socket } = useContext(SocketContext);
   const { setUsername } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -38,40 +38,34 @@ const EnterPage = () => {
     };
 
     fetchData();
-  }, []);
 
+    // Socket event listeners within useEffect
+    if (socket) {
+      socket.on("userRegistered", (userData) => {
+        console.log(`Register Success Username : ${userData.username}`);
+        setUsername(userData.username);
+        navigate("/Home");
+      });
+
+      socket.on("userRegisterFailed", (data) => {
+        console.error("Register Failed");
+        alert(data.msg);
+      });
+    }
+
+    // Cleanup function to remove the listeners when unmounting
+    return () => {
+      if (!socket) return;
+      socket.off("userRegistered");
+      socket.off("userRegisterFailed");
+    };
+  }, [socket]);
   const handleEnter = () => {
+    console.log("Submitting");
+    console.log(`Socket : ${socket != null}`);
     const userData = { username: name };
     socket.emit("registerUser", userData);
-
-    socket.on("userRegistered", (userData) => {
-      console.log(`Register Success Username : ${userData.username}`);
-      setUsername(userData.username);
-      navigate("/Home");
-    });
-
-    socket.on("userRegisterFailed", (data) => {
-      console.error("Register Failed");
-      alert(data.msg);
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Username submitted:", name);
-    const userData = { username: name };
-    socket.emit("registerUser", userData);
-
-    socket.on("userRegistered", (userData) => {
-      console.log(`Register Success Username : ${userData.username}`);
-      setUsername(userData.username);
-      navigate("/Home");
-    });
-
-    socket.on("userRegisterFailed", (data) => {
-      console.error("Register Failed");
-      alert(data.msg);
-    });
+    console.log(`Register Emitted`);
   };
 
   return (
@@ -92,14 +86,19 @@ const EnterPage = () => {
           <p className="text-sm text-center mb-8">
             Free and lightweight Chess Platform
           </p>
-          <form onSubmit={handleSubmit} className="flex items-center mb-8">
-            {/* Integrate EnterBox logic into the username input */}
+          {/* Removed the form, directly handle onClick on the button */}
+          <div className="flex items-center mb-8">
             <input
               type="text"
               placeholder="Enter your username"
               className="bg-gray-800 border border-gray-700 rounded-l px-4 py-3 outline-none focus:border-blue-500 w-64"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleEnter();
+                }
+              }}
             />
             <button
               type="button"
@@ -108,7 +107,7 @@ const EnterPage = () => {
             >
               Enter
             </button>
-          </form>
+          </div>
           <div className="text-center">
             <p>Server Status: {serverStatus}</p>
             <p>{playersOnline} players Online</p>

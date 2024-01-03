@@ -27,6 +27,7 @@ function Navbar() {
     socket.disconnect();
     setUsername("");
     navigate("/");
+    window.location.reload();
   };
 
   return (
@@ -48,14 +49,16 @@ function Navbar() {
                 Home
               </Link>
             </li>
-            <li>
-              <Link
-                to="/Join"
-                className="text-gray-400 transition duration-300 ease-in-out hover:text-gray-100"
-              >
-                Join Game
-              </Link>
-            </li>
+            {username && (
+              <li>
+                <Link
+                  to="/Join"
+                  className="text-gray-400 transition duration-300 ease-in-out hover:text-gray-100"
+                >
+                  Join Game
+                </Link>
+              </li>
+            )}
             <li>
               <Link
                 to="/docs"
