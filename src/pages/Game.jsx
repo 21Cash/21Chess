@@ -44,7 +44,9 @@ const Game = () => {
   let opponentUsername;
 
   const handleMoveSound = async () => {
-    const captureMove = game.history({ verbose: true }).splice(-1)[0].captured;
+    let captureMove = false;
+    if (game.history({ verbose: true }) == null) captureMove = false;
+    else captureMove = game.history({ verbose: true }).splice(-1)[0].captured;
     if (game.game_over()) {
       gameEndSound.play();
     } else if (captureMove) {
@@ -55,6 +57,9 @@ const Game = () => {
   };
 
   useEffect(() => {
+    // This is Hot Fix, May not work in future,
+    // TODO : Send Full Game State Through Server
+    setGame(new Chess());
     socket.on("moveMessage", (data) => {
       const { senderId, gameString, senderName, color, moveObj } = data;
       console.log("Move received.");
