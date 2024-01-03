@@ -62,7 +62,6 @@ const EnterPage = () => {
   }, [socket]);
   const handleEnter = () => {
     console.log("Submitting");
-    console.log(`Socket : ${socket != null}`);
     const userData = { username: name };
     socket.emit("registerUser", userData);
     console.log(`Register Emitted`);

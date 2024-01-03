@@ -2,7 +2,9 @@ import React, { useState, useRef, useContext, useEffect } from "react";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { GameContext, SocketContext, UserContext } from "../Context";
-import soundEffect from "../media/Move.mp3";
+import moveSoundEffect from "../media/Move.mp3";
+import captureSoundEffect from "../media/Capture.mp3";
+import gameEndSoundEffect from "../media/GameEnd.mp3";
 
 const buttonStyle = {
   cursor: "pointer",
@@ -34,11 +36,23 @@ const Game = () => {
   const { socket } = useContext(SocketContext);
   const { gameContext, setGameContext } = useContext(GameContext);
   const { username } = useContext(UserContext);
-  const [moveSound] = useState(new Audio(soundEffect));
-
+  const [moveSound] = useState(new Audio(moveSoundEffect));
+  const [captureSound] = useState(new Audio(captureSoundEffect));
+  const [gameEndSound] = useState(new Audio(gameEndSoundEffect));
+  const [canMakeMoves, setCanMakeMoves] = useState(false);
   const myColor = gameContext.myColor;
-  let canMakeMoves = false;
   let opponentUsername;
+
+  const handleMoveSound = async () => {
+    const captureMove = game.history({ verbose: true }).splice(-1)[0].captured;
+    if (game.game_over()) {
+      gameEndSound.play();
+    } else if (captureMove) {
+      captureSound.play();
+    } else {
+      moveSound.play();
+    }
+  };
 
   useEffect(() => {
     socket.on("moveMessage", (data) => {
@@ -57,24 +71,25 @@ const Game = () => {
       });
 
       console.log(data);
-      moveSound.play();
+      // moveSound.play();
+      handleMoveSound();
     });
     socket.on("startGame", (gameData) => {
       console.log("Game Started.");
       const { whiteName, blackName } = gameData;
-      canMakeMoves = true;
       let opponentName;
       if (username == whiteName) {
         opponentName = blackName;
       } else opponentName = whiteName;
       setGameContext({ ...gameContext, opponent: opponentName });
+      setCanMakeMoves(true);
       console.log(`Opponent : ${opponentName}`);
       opponentUsername = opponentName;
     });
 
     socket.on("endGame", (resultData) => {
       const { isDraw, winColor, winnerName } = resultData;
-
+      console.log(resultData);
       if (isDraw) {
         setGameContext({
           ...gameContext,
@@ -115,12 +130,14 @@ const Game = () => {
   };
 
   const onDrop = (sourceSquare, targetSquare, piece) => {
+    if (!canMakeMoves) return false; // if Game Hasnt begun, Dont make move
     const gameCopy = { ...game };
     const move = gameCopy.move({
       from: sourceSquare,
       to: targetSquare,
       promotion: piece[1]?.toLowerCase() ?? "q",
     });
+
     setGame(gameCopy);
 
     if (move === null) return false;
@@ -133,7 +150,9 @@ const Game = () => {
       moveObj: move,
     };
     socket.emit("sendMove", moveData);
-    moveSound.play();
+    // moveSound.play();
+    handleMoveSound();
+
     return true;
   };
   return (
