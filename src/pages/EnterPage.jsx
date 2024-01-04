@@ -21,7 +21,6 @@ const EnterPage = () => {
         if (response.ok) {
           const data = await response.json();
           setServerStatus("Online");
-          console.log(response.data);
           setPlayersOnline(`${data.playersOnline} `);
           setLoading(false);
           setError(false);

@@ -40,13 +40,15 @@ const Game = () => {
   const [captureSound] = useState(new Audio(captureSoundEffect));
   const [gameEndSound] = useState(new Audio(gameEndSoundEffect));
   const [canMakeMoves, setCanMakeMoves] = useState(false);
+
+  const [lastMoveSquares, setLastMoveSquares] = useState([]);
   const myColor = gameContext.myColor;
   let opponentUsername;
 
   const handleMoveSound = async () => {
     let captureMove = false;
     if (game.history({ verbose: true }) == null) captureMove = false;
-    else captureMove = game.history({ verbose: true }).splice(-1)[0].captured;
+    else captureMove = game.history({ verbose: true }).splice(-1)[0]?.captured;
     if (game.game_over()) {
       gameEndSound.play();
     } else if (captureMove) {
@@ -57,12 +59,14 @@ const Game = () => {
   };
 
   useEffect(() => {
+    console.log(`Use Effect Being Called`);
     // This is Hot Fix, May not work in future,
     // TODO : Send Full Game State Through Server
     setGame(new Chess());
+
     socket.on("moveMessage", (data) => {
       const { senderId, gameString, senderName, color, moveObj } = data;
-      console.log("Move received.");
+      console.log(`Move received => ${moveObj.san}`);
       if (senderId == socket.id) return; // Ignore self Moves
 
       const opponentMove = moveObj;
@@ -75,9 +79,8 @@ const Game = () => {
         }
       });
 
-      console.log(data);
-      // moveSound.play();
       handleMoveSound();
+      setLastMoveSquaresTo([moveObj.from, moveObj.to]);
     });
     socket.on("startGame", (gameData) => {
       console.log("Game Started.");
@@ -119,6 +122,14 @@ const Game = () => {
     });
   };
 
+  const setLastMoveSquaresTo = (squares) => {
+    const hightlightSquares = Object.fromEntries(
+      squares.map((item) => [item, { background: "lightgreen" }])
+    );
+    // update last moves State
+    setLastMoveSquares(hightlightSquares);
+  };
+
   const handleOpponentMoveInput = () => {
     const opponentMove = opponentMoveInput.trim();
 
@@ -146,7 +157,6 @@ const Game = () => {
     setGame(gameCopy);
 
     if (move === null) return false;
-    console.log(move);
 
     //  const { gameString, moveString, color } = moveData;
     const moveData = {
@@ -154,10 +164,10 @@ const Game = () => {
       color: myColor,
       moveObj: move,
     };
+    setLastMoveSquaresTo([move.from, move.to]);
     socket.emit("sendMove", moveData);
     // moveSound.play();
     handleMoveSound();
-
     return true;
   };
   return (
@@ -172,6 +182,9 @@ const Game = () => {
       <div className="flex-3 flex justify-center">
         <div className="pt-5" style={boardWrapper}>
           <Chessboard
+            customSquareStyles={{
+              ...lastMoveSquares,
+            }}
             id="PremovesEnabled"
             arePremovesAllowed={true}
             position={game.fen()}
