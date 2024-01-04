@@ -124,7 +124,7 @@ const Game = () => {
 
   const setLastMoveSquaresTo = (squares) => {
     const hightlightSquares = Object.fromEntries(
-      squares.map((item) => [item, { background: "lightgreen" }])
+      squares.map((item) => [item, { background: "rgba(144, 238, 144, 0.90)" }])
     );
     // update last moves State
     setLastMoveSquares(hightlightSquares);
