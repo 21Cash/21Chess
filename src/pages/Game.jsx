@@ -45,13 +45,20 @@ const Game = () => {
   const myColor = gameContext.myColor;
   let opponentUsername;
 
-  const handleMoveSound = async () => {
-    let captureMove = false;
-    if (game.history({ verbose: true }) == null) captureMove = false;
-    else captureMove = game.history({ verbose: true }).splice(-1)[0]?.captured;
-    if (game.game_over()) {
+  const safeGameMutate = (modify) => {
+    setGame((g) => {
+      const update = { ...g };
+      modify(update);
+      return update;
+    });
+  };
+
+  const handleMoveSound = async (moveObj) => {
+    const isCapture = moveObj.flags.includes("c");
+    const isCheckmate = moveObj.san.includes("#");
+    if (isCheckmate) {
       gameEndSound.play();
-    } else if (captureMove) {
+    } else if (isCapture) {
       captureSound.play();
     } else {
       moveSound.play();
@@ -69,6 +76,8 @@ const Game = () => {
       console.log(`Move received => ${moveObj.san}`);
       if (senderId == socket.id) return; // Ignore self Moves
 
+      console.log(`SERVER`);
+      console.log(moveObj);
       const opponentMove = moveObj;
       safeGameMutate((game) => {
         const move = game.move(opponentMove);
@@ -79,7 +88,7 @@ const Game = () => {
         }
       });
 
-      handleMoveSound();
+      handleMoveSound(moveObj);
       setLastMoveSquaresTo([moveObj.from, moveObj.to]);
     });
     socket.on("startGame", (gameData) => {
@@ -114,35 +123,12 @@ const Game = () => {
     });
   }, []);
 
-  const safeGameMutate = (modify) => {
-    setGame((g) => {
-      const update = { ...g };
-      modify(update);
-      return update;
-    });
-  };
-
   const setLastMoveSquaresTo = (squares) => {
     const hightlightSquares = Object.fromEntries(
       squares.map((item) => [item, { background: "rgba(144, 238, 144, 0.90)" }])
     );
     // update last moves State
     setLastMoveSquares(hightlightSquares);
-  };
-
-  const handleOpponentMoveInput = () => {
-    const opponentMove = opponentMoveInput.trim();
-
-    safeGameMutate((game) => {
-      const move = game.move(opponentMove);
-      if (move !== null) {
-        // Handle valid move
-      } else {
-        console.log("Invalid move");
-      }
-    });
-
-    setOpponentMoveInput("");
   };
 
   const onDrop = (sourceSquare, targetSquare, piece) => {
@@ -166,8 +152,7 @@ const Game = () => {
     };
     setLastMoveSquaresTo([move.from, move.to]);
     socket.emit("sendMove", moveData);
-    // moveSound.play();
-    handleMoveSound();
+    handleMoveSound(move);
     return true;
   };
   return (
