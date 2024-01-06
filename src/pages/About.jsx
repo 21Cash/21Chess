@@ -11,7 +11,7 @@ const About = () => {
             provide a minimalistic, ad-free, and fun experience.
           </p>
           <p className="mb-8 text-lg">
-            21Chess is built by 21Cash as a weekend project.
+            21Chess was built by 21Cash as a weekend project.
           </p>
           <div className="mt-8">
             <a
