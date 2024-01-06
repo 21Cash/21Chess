@@ -67,7 +67,7 @@ const EnterPage = () => {
   };
 
   return (
-    <div className="h-screen bg-gray-900 text-white flex flex-col justify-between pt-20">
+    <div className="h-screen bg-gray-900 to-gray-900 text-white flex flex-col justify-between pt-20">
       {loading ? (
         <div className="flex items-center justify-center h-screen">
           <p className="text-4xl">Loading...</p>
@@ -113,7 +113,7 @@ const EnterPage = () => {
         </div>
       )}
 
-      <footer className="bg-gray-800 text-center py-4">
+      <footer className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-center py-4">
         <p className="text-gray-400">
           &#169; {new Date().getFullYear()} 21Chess. Made with &#10084;&#65039;
           by 21Cash.{" "}

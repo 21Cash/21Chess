@@ -43,8 +43,8 @@ const JoinGame = () => {
   };
 
   return (
-    <div className="bg-gray-800 flex items-center justify-center min-h-screen">
-      <div className="bg-gray-900 p-8 rounded-lg shadow-md w-2/6 py-16">
+    <div className="bg-gray-900 flex items-center justify-center min-h-screen ">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-md w-2/6 py-16">
         <input
           className="mb-4 w-full shadow appearance-none border rounded py-2 px-3 text-gray-700  leading-tight focus:outline-none focus:shadow-outline"
           type="text"
