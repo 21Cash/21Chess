@@ -232,7 +232,7 @@ const Game = () => {
             {!gameHasStarted ? `?? : ??` : getTimeFormattedString(opponentTime)}
           </div>
 
-          <div className="text-gray-900 text-3xl font-thin my-2">
+          <div className="text-gray-900 text-3xl mb-4 font-thin mt-4">
             {gameContext.opponent !== "" ? gameContext.opponent : "Waiting..."}
           </div>
 
