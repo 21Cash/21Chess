@@ -39,7 +39,7 @@ const Game = () => {
   const [moveSound] = useState(new Audio(moveSoundEffect));
   const [captureSound] = useState(new Audio(captureSoundEffect));
   const [gameEndSound] = useState(new Audio(gameEndSoundEffect));
-  const [canMakeMoves, setCanMakeMoves] = useState(false);
+  const [gameHasStarted, setGameHasStared] = useState(false);
   const [myTime, setMyTime] = useState(0);
   const [opponentTime, setOpponentTime] = useState(0);
   const [lastMoveSquares, setLastMoveSquares] = useState([]);
@@ -104,6 +104,11 @@ const Game = () => {
       } = data;
       console.log(`Move received => ${moveObj.san}`);
       toMakeMoveColor = color == "w" ? "b" : "w";
+      console.log(
+        `${getTimeFormattedString(whiteTime)}, ${getTimeFormattedString(
+          blackTime
+        )}`
+      );
       updateTimers(whiteTime, blackTime);
       if (senderId == socket.id) return; // Ignore self Moves
 
@@ -133,7 +138,7 @@ const Game = () => {
         opponentName = blackName;
       } else opponentName = whiteName;
       setGameContext({ ...gameContext, opponent: opponentName });
-      setCanMakeMoves(true);
+      setGameHasStared(true);
       console.log(`Opponent : ${opponentName}`);
       opponentUsername = opponentName;
     });
@@ -154,6 +159,8 @@ const Game = () => {
           opponent: opponentUsername,
         });
       }
+
+      gameEndSound.play();
     });
   }, []);
 
@@ -166,7 +173,7 @@ const Game = () => {
   };
 
   const onDrop = (sourceSquare, targetSquare, piece) => {
-    if (!canMakeMoves) return false; // if Game Hasnt begun, Dont make move
+    if (!gameHasStarted) return false; // if Game Hasnt begun, Dont make move
     const gameCopy = { ...game };
     const move = gameCopy.move({
       from: sourceSquare,
@@ -223,7 +230,9 @@ const Game = () => {
         <div className="text-lg font-semibold text-gray-700 mb-2">
           <>
             <div className="text-4xl text-white">
-              {getTimeFormattedString(opponentTime)}
+              {!gameHasStarted
+                ? `?? : ??`
+                : getTimeFormattedString(opponentTime)}
             </div>
           </>
 
@@ -240,7 +249,7 @@ const Game = () => {
           <div className="text-lg font-semibold text-gray-700 mt-auto">
             <>
               <div className="text-font-bold text-white text-4xl">
-                {getTimeFormattedString(myTime)}
+                {!gameHasStarted ? "?? : ??" : getTimeFormattedString(myTime)}
               </div>
             </>
           </div>
@@ -255,7 +264,7 @@ const getTimeFormattedString = (timeInMs) => {
   const remainingTime = timeInMs;
   const minutes = Math.floor(remainingTime / 60000);
   const seconds = ((remainingTime % 60000) / 1000).toFixed(0).padStart(2, "0");
-  const timeString = `${minutes}:${seconds}`;
+  const timeString = `${minutes} : ${seconds}`;
   return timeString;
 };
 

@@ -7,7 +7,7 @@ const getTimeData = (format) => {
   const timeData = {};
   if (format == "Rapid") {
     timeData.totalTime = 10;
-    timeData.timeIncrement = 5;
+    timeData.timeIncrement = 2;
   } else if (format == "Blitz") {
     timeData.totalTime = 3;
     timeData.timeIncrement = 2;
