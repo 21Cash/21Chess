@@ -226,34 +226,32 @@ const Game = () => {
           />
         </div>
       </div>
-      <div className="my-48 mx-10 flex-1 bg-gray-500 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
-        <div className="text-lg font-semibold text-gray-700 mb-2">
-          <>
-            <div className="text-4xl text-white">
-              {!gameHasStarted
-                ? `?? : ??`
-                : getTimeFormattedString(opponentTime)}
-            </div>
-          </>
+      <div className="h-2/3 self-center my-6 mx-4 flex-1 bg-gray-500 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
+        <div className="text-lg font-semibold text-gray-700 mb-4">
+          <div className="text-black text-4xl bg-gray-600 p-4 rounded-md pt-4 font-bold">
+            {!gameHasStarted ? `?? : ??` : getTimeFormattedString(opponentTime)}
+          </div>
 
-          <div className="text-gray-900 text-3xl font-bold my-2">
+          <div className="text-gray-900 text-3xl font-thin my-2">
             {gameContext.opponent !== "" ? gameContext.opponent : "Waiting..."}
           </div>
 
           <div className="text-base mb-2">vs</div>
 
-          <div className="text-gray-900 text-3xl font-bold mb-4">
+          <div className="text-gray-900 text-3xl mb-4 font-thin">
             {username}
           </div>
 
           <div className="text-lg font-semibold text-gray-700 mt-auto">
-            <>
-              <div className="text-font-bold text-white text-4xl">
-                {!gameHasStarted ? "?? : ??" : getTimeFormattedString(myTime)}
-              </div>
-            </>
+            <div className="text-black text-4xl bg-gray-600 p-4 rounded-md font-bold">
+              {!gameHasStarted ? "?? : ??" : getTimeFormattedString(myTime)}
+            </div>
           </div>
         </div>
+
+        <button className="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50">
+          Resign
+        </button>
       </div>
     </div>
   );
@@ -264,7 +262,8 @@ const getTimeFormattedString = (timeInMs) => {
   const remainingTime = timeInMs;
   const minutes = Math.floor(remainingTime / 60000);
   const seconds = ((remainingTime % 60000) / 1000).toFixed(0).padStart(2, "0");
-  const timeString = `${minutes} : ${seconds}`;
+  const formattedMinutes = String(minutes).padStart(2, "0"); // Adding leading zero if needed
+  const timeString = `${formattedMinutes} : ${seconds}`;
   return timeString;
 };
 
