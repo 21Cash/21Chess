@@ -5,6 +5,7 @@ import { GameContext, SocketContext, UserContext } from "../Context";
 import moveSoundEffect from "../media/Move.mp3";
 import captureSoundEffect from "../media/Capture.mp3";
 import gameEndSoundEffect from "../media/GameEnd.mp3";
+import drawSoundEffect from "../media/Draw.mp3";
 
 const buttonStyle = {
   cursor: "pointer",
@@ -39,7 +40,8 @@ const Game = () => {
   const [moveSound] = useState(new Audio(moveSoundEffect));
   const [captureSound] = useState(new Audio(captureSoundEffect));
   const [gameEndSound] = useState(new Audio(gameEndSoundEffect));
-  const [gameHasStarted, setGameHasStared] = useState(false);
+  const [drawSound] = useState(new Audio(drawSoundEffect));
+  const [gameHasStarted, setGameHasStarted] = useState(false);
   const [myTime, setMyTime] = useState(0);
   const [opponentTime, setOpponentTime] = useState(0);
   const [lastMoveSquares, setLastMoveSquares] = useState([]);
@@ -91,8 +93,10 @@ const Game = () => {
     // This is Hot Fix, May not work in future,
     // TODO : Send Full Game State Through Server
     setGame(new Chess());
+    setGameHasStarted(false);
 
     socket.on("moveMessage", (data) => {
+      setGameHasStarted(true);
       const {
         senderId,
         gameString,
@@ -112,7 +116,6 @@ const Game = () => {
       updateTimers(whiteTime, blackTime);
       if (senderId == socket.id) return; // Ignore self Moves
 
-      console.log(`SERVER`);
       console.log(moveObj);
 
       const opponentMove = moveObj;
@@ -138,31 +141,39 @@ const Game = () => {
         opponentName = blackName;
       } else opponentName = whiteName;
       setGameContext({ ...gameContext, opponent: opponentName });
-      setGameHasStared(true);
+      setGameHasStarted(true);
       console.log(`Opponent : ${opponentName}`);
       opponentUsername = opponentName;
     });
 
     socket.on("endGame", (resultData) => {
-      const { isDraw, winColor, winnerName } = resultData;
+      const { isDraw, winColor, winnerName, cause, pgn } = resultData;
       console.log(resultData);
       if (isDraw) {
         setGameContext({
           ...gameContext,
           result: "Draw",
           opponent: opponentUsername,
+          pgn,
         });
+        drawSound.play();
       } else {
         setGameContext({
           ...gameContext,
-          result: `Checkmate, ${winnerName} Won`,
+          result: `${winnerName} Won By ${cause}`,
           opponent: opponentUsername,
+          pgn,
         });
+        gameEndSound.play();
       }
-
-      gameEndSound.play();
+      clearInterval(interval);
     });
   }, []);
+
+  const onClickResign = () => {
+    if (!gameHasStarted) return;
+    socket.emit("resign");
+  };
 
   const setLastMoveSquaresTo = (squares) => {
     const hightlightSquares = Object.fromEntries(
@@ -232,7 +243,7 @@ const Game = () => {
             {!gameHasStarted ? `?? : ??` : getTimeFormattedString(opponentTime)}
           </div>
 
-          <div className="text-gray-900 text-3xl mb-4 font-thin mt-4">
+          <div className="text-gray-900 text-3xl mb-2 font-thin mt-4">
             {gameContext.opponent !== "" ? gameContext.opponent : "Waiting..."}
           </div>
 
@@ -249,7 +260,10 @@ const Game = () => {
           </div>
         </div>
 
-        <button className="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50">
+        <button
+          onClick={onClickResign}
+          className="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50"
+        >
           Resign
         </button>
       </div>
