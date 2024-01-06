@@ -13,7 +13,7 @@ const getTimeData = (format) => {
     timeData.timeIncrement = 2;
   } else if (format == "Bullet") {
     timeData.totalTime = 1;
-    timeData.timeIncrement = 1;
+    timeData.timeIncrement = 0;
   }
   return timeData;
 };

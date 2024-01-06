@@ -40,10 +40,13 @@ const Game = () => {
   const [captureSound] = useState(new Audio(captureSoundEffect));
   const [gameEndSound] = useState(new Audio(gameEndSoundEffect));
   const [canMakeMoves, setCanMakeMoves] = useState(false);
-
+  const [myTime, setMyTime] = useState(0);
+  const [opponentTime, setOpponentTime] = useState(0);
   const [lastMoveSquares, setLastMoveSquares] = useState([]);
   const myColor = gameContext.myColor;
+  let toMakeMoveColor = myColor;
   let opponentUsername;
+  let interval;
 
   const safeGameMutate = (modify) => {
     setGame((g) => {
@@ -65,6 +68,24 @@ const Game = () => {
     }
   };
 
+  const updateTimers = (whiteTimerInMs, blackTimeInMs) => {
+    if (myColor == "w") {
+      setMyTime(whiteTimerInMs);
+      setOpponentTime(blackTimeInMs);
+    } else {
+      setMyTime(blackTimeInMs);
+      setOpponentTime(whiteTimerInMs);
+    }
+    clearInterval(interval);
+    interval = setInterval(() => {
+      if (myColor == toMakeMoveColor) {
+        setMyTime((prevTime) => Math.max(prevTime - 1000, 0));
+      } else {
+        setOpponentTime((prevTime) => Math.max(prevTime - 1000, 0));
+      }
+    }, 1000);
+  };
+
   useEffect(() => {
     console.log(`Use Effect Being Called`);
     // This is Hot Fix, May not work in future,
@@ -72,12 +93,23 @@ const Game = () => {
     setGame(new Chess());
 
     socket.on("moveMessage", (data) => {
-      const { senderId, gameString, senderName, color, moveObj } = data;
+      const {
+        senderId,
+        gameString,
+        senderName,
+        color,
+        moveObj,
+        blackTime,
+        whiteTime,
+      } = data;
       console.log(`Move received => ${moveObj.san}`);
+      toMakeMoveColor = color == "w" ? "b" : "w";
+      updateTimers(whiteTime, blackTime);
       if (senderId == socket.id) return; // Ignore self Moves
 
       console.log(`SERVER`);
       console.log(moveObj);
+
       const opponentMove = moveObj;
       safeGameMutate((game) => {
         const move = game.move(opponentMove);
@@ -90,6 +122,8 @@ const Game = () => {
 
       handleMoveSound(moveObj);
       setLastMoveSquaresTo([moveObj.from, moveObj.to]);
+
+      return () => clearInterval(interval);
     });
     socket.on("startGame", (gameData) => {
       console.log("Game Started.");
@@ -158,7 +192,6 @@ const Game = () => {
   return (
     <div className="flex">
       {/* Left div for chatbox */}
-
       <div className="my-10 mx-5 flex-1 bg-gray-600 p-4">
         {/* Chatbox content goes here */}
       </div>
@@ -186,24 +219,44 @@ const Game = () => {
           />
         </div>
       </div>
+      <div className="my-48 mx-10 flex-1 bg-gray-500 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+        <div className="text-lg font-semibold text-gray-700 mb-2">
+          <>
+            <div className="text-4xl text-white">
+              {getTimeFormattedString(opponentTime)}
+            </div>
+          </>
 
-      {/* Right div for game information */}
-      <div className="my-48 mx-10 flex-1 bg-gray-500 rounded-2xl p-4 flex flex-col justify-center items-center">
-        <div className="text-gray-900  text-4xl font-bold mb-2">
-          {/* Display opponent's name in big font */}
-          {gameContext.opponent != "" ? gameContext.opponent : "Waiting..."}
-        </div>
-        <div className="text-sm mb-2">
-          {/* Small 'vs' text */}
-          vs
-        </div>
-        <div className="text-gray-900 text-4xl font-bold">
-          {/* Display username in big font */}
-          {username}
+          <div className="text-gray-900 text-3xl font-bold my-2">
+            {gameContext.opponent !== "" ? gameContext.opponent : "Waiting..."}
+          </div>
+
+          <div className="text-base mb-2">vs</div>
+
+          <div className="text-gray-900 text-3xl font-bold mb-4">
+            {username}
+          </div>
+
+          <div className="text-lg font-semibold text-gray-700 mt-auto">
+            <>
+              <div className="text-font-bold text-white text-4xl">
+                {getTimeFormattedString(myTime)}
+              </div>
+            </>
+          </div>
         </div>
       </div>
     </div>
   );
+};
+
+// Debuggine Purpose Code
+const getTimeFormattedString = (timeInMs) => {
+  const remainingTime = timeInMs;
+  const minutes = Math.floor(remainingTime / 60000);
+  const seconds = ((remainingTime % 60000) / 1000).toFixed(0).padStart(2, "0");
+  const timeString = `${minutes}:${seconds}`;
+  return timeString;
 };
 
 export default Game;
