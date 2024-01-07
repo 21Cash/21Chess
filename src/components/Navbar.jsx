@@ -70,6 +70,14 @@ function Navbar() {
                 About
               </Link>
             </li>
+            <li>
+              <Link
+                to="/spectatePage"
+                className="text-gray-400 transition duration-300 ease-in-out hover:text-gray-100"
+              >
+                Spectate
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
