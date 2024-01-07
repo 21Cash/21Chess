@@ -37,7 +37,7 @@ const STARTING_POSITION_FEN =
 
 const SpectateGame = () => {
   const { gameString } = useParams();
-
+  const game = useMemo(() => new Chess(), []);
   const [opponentMoveInput, setOpponentMoveInput] = useState("");
   const chessboardRef = useRef(null);
   const { spectateContext } = useContext(SpectateContext);
@@ -56,6 +56,7 @@ const SpectateGame = () => {
   const [myTime, setMyTime] = useState(spectateContext.whiteTime);
   const [opponentTime, setOpponentTime] = useState(spectateContext.blackTime);
   const [lastMoveSquares, setLastMoveSquares] = useState([]);
+  const [kingInCheckSquare, setKingInCheckSquare] = useState(null);
 
   const myColor = "w";
   let toMakeMoveColor = myColor;
@@ -97,6 +98,36 @@ const SpectateGame = () => {
     }, 1000);
   };
 
+  const updateKingInCheckSquare = () => {
+    const checkedColor = game.turn();
+    if (game.in_check()) {
+      let kingSquare = null;
+      for (let file = "a".charCodeAt(0); file <= "h".charCodeAt(0); file++) {
+        for (let rank = 1; rank <= 8; rank++) {
+          let curSqaure = String.fromCharCode(file) + rank;
+          const squareDetails = game.get(curSqaure);
+          if (
+            squareDetails &&
+            squareDetails.type == "k" &&
+            squareDetails.color == checkedColor
+          ) {
+            kingSquare = curSqaure;
+            break;
+          }
+        }
+      }
+      setKingInCheckSquare({
+        [kingSquare]: {
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle at center, #FF0000, #FFDAB9 100%)",
+        },
+      });
+    } else {
+      setKingInCheckSquare(null);
+    }
+  };
+
   useEffect(() => {
     console.log(`Use Effect Being Called`);
     // This is Hot Fix, May not work in future,
@@ -120,10 +151,13 @@ const SpectateGame = () => {
       toMakeMoveColor = color == "w" ? "b" : "w";
       updateTimers(whiteTime, blackTime);
 
+      // Update game, so that we can know checks
+      game.load(fen);
       setCurrentPosition(fen);
 
       handleMoveSound(moveObj);
       setLastMoveSquaresTo([moveObj.from, moveObj.to]);
+      updateKingInCheckSquare();
 
       return () => clearInterval(interval);
     });
@@ -173,6 +207,7 @@ const SpectateGame = () => {
           <Chessboard
             customSquareStyles={{
               ...lastMoveSquares,
+              ...kingInCheckSquare,
             }}
             position={currentPosition}
             customBoardStyle={{
