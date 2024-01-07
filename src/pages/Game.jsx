@@ -46,6 +46,8 @@ const Game = () => {
   const [myTime, setMyTime] = useState(0);
   const [opponentTime, setOpponentTime] = useState(0);
   const [lastMoveSquares, setLastMoveSquares] = useState([]);
+  const [kingInCheckSquare, setKingInCheckSquare] = useState(null);
+
   const myColor = gameContext.myColor;
   let toMakeMoveColor = myColor;
   let opponentUsername;
@@ -81,6 +83,36 @@ const Game = () => {
     }, 1000);
   };
 
+  const updateKingInCheckSquare = () => {
+    const checkedColor = game.turn();
+    if (game.in_check()) {
+      let kingSquare = null;
+      for (let file = "a".charCodeAt(0); file <= "h".charCodeAt(0); file++) {
+        for (let rank = 1; rank <= 8; rank++) {
+          let curSqaure = String.fromCharCode(file) + rank;
+          const squareDetails = game.get(curSqaure);
+          if (
+            squareDetails &&
+            squareDetails.type == "k" &&
+            squareDetails.color == checkedColor
+          ) {
+            kingSquare = curSqaure;
+            break;
+          }
+        }
+      }
+      setKingInCheckSquare({
+        [kingSquare]: {
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle at center, #FF0000, #FFDAB9 100%)",
+        },
+      });
+    } else {
+      setKingInCheckSquare(null);
+    }
+  };
+
   useEffect(() => {
     console.log(`Use Effect Being Called`);
     // This is Hot Fix, May not work in future,
@@ -110,7 +142,7 @@ const Game = () => {
 
       handleMoveSound(moveObj);
       setLastMoveSquaresTo([moveObj.from, moveObj.to]);
-
+      updateKingInCheckSquare();
       return () => clearInterval(interval);
     });
     socket.on("startGame", (gameData) => {
@@ -184,6 +216,7 @@ const Game = () => {
       moveObj: moveObject,
     };
     setLastMoveSquaresTo([move.from, move.to]);
+    updateKingInCheckSquare();
     socket.emit("sendMove", moveData);
     handleMoveSound(move);
     return true;
@@ -201,6 +234,7 @@ const Game = () => {
           <Chessboard
             customSquareStyles={{
               ...lastMoveSquares,
+              ...kingInCheckSquare,
             }}
             id="PremovesEnabled"
             arePremovesAllowed={true}
