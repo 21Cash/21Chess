@@ -1,4 +1,4 @@
-import React, { useState, useRef, useContext, useEffect } from "react";
+import React, { useState, useRef, useMemo, useContext, useEffect } from "react";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { GameContext, SocketContext, UserContext } from "../Context";
@@ -31,7 +31,8 @@ const boardWrapper = {
   margin: "3rem auto",
 };
 const Game = () => {
-  const [game, setGame] = useState(new Chess());
+  const game = useMemo(() => new Chess(), []);
+  const [currentPosition, setCurrentPosition] = useState(game.fen());
   const [opponentMoveInput, setOpponentMoveInput] = useState("");
   const chessboardRef = useRef(null);
   const { socket } = useContext(SocketContext);
@@ -49,14 +50,6 @@ const Game = () => {
   let toMakeMoveColor = myColor;
   let opponentUsername;
   let interval;
-
-  const safeGameMutate = (modify) => {
-    setGame((g) => {
-      const update = { ...g };
-      modify(update);
-      return update;
-    });
-  };
 
   const handleMoveSound = async (moveObj) => {
     const isCapture = moveObj.flags.includes("c");
@@ -92,7 +85,6 @@ const Game = () => {
     console.log(`Use Effect Being Called`);
     // This is Hot Fix, May not work in future,
     // TODO : Send Full Game State Through Server
-    setGame(new Chess());
     setGameHasStarted(false);
 
     socket.on("moveMessage", (data) => {
@@ -105,28 +97,16 @@ const Game = () => {
         moveObj,
         blackTime,
         whiteTime,
+        fen,
       } = data;
       console.log(`Move received => ${moveObj.san}`);
+      console.log(moveObj.san);
       toMakeMoveColor = color == "w" ? "b" : "w";
-      console.log(
-        `${getTimeFormattedString(whiteTime)}, ${getTimeFormattedString(
-          blackTime
-        )}`
-      );
       updateTimers(whiteTime, blackTime);
       if (senderId == socket.id) return; // Ignore self Moves
 
-      console.log(moveObj);
-
-      const opponentMove = moveObj;
-      safeGameMutate((game) => {
-        const move = game.move(opponentMove);
-        if (move !== null) {
-          // Handle valid move
-        } else {
-          console.log("Invalid move");
-        }
-      });
+      game.move(moveObj);
+      setCurrentPosition(game.fen());
 
       handleMoveSound(moveObj);
       setLastMoveSquaresTo([moveObj.from, moveObj.to]);
@@ -185,14 +165,15 @@ const Game = () => {
 
   const onDrop = (sourceSquare, targetSquare, piece) => {
     if (!gameHasStarted) return false; // if Game Hasnt begun, Dont make move
-    const gameCopy = { ...game };
-    const move = gameCopy.move({
+
+    const moveObject = {
       from: sourceSquare,
       to: targetSquare,
       promotion: piece[1]?.toLowerCase() ?? "q",
-    });
+    };
+    const move = game.move(moveObject);
 
-    setGame(gameCopy);
+    setCurrentPosition(game.fen());
 
     if (move === null) return false;
 
@@ -200,7 +181,7 @@ const Game = () => {
     const moveData = {
       gameString: gameContext.gameString,
       color: myColor,
-      moveObj: move,
+      moveObj: moveObject,
     };
     setLastMoveSquaresTo([move.from, move.to]);
     socket.emit("sendMove", moveData);
@@ -223,7 +204,7 @@ const Game = () => {
             }}
             id="PremovesEnabled"
             arePremovesAllowed={true}
-            position={game.fen()}
+            position={currentPosition}
             isDraggablePiece={({ piece }) => piece[0] === myColor[0]}
             onPieceDrop={onDrop}
             customBoardStyle={{
