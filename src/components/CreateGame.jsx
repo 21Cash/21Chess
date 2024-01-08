@@ -52,12 +52,14 @@ const CreateGame = () => {
         gameString: gameString,
       };
       */
-      const { gameString, showEval } = gameInfo;
+      const { gameString, showEval, totalTime, timeIncrement } = gameInfo;
       setGameContext({
         ...gameContext,
         myColor: gameInfo.creatorColor,
         showEval,
         gameString: gameInfo.gameString,
+        totalTimeInSecs: totalTime * 60,
+        timeIncrementInSecs: timeIncrement,
       });
       console.log(gameContext);
       navigate(`/Game/${gameString}`);
@@ -65,7 +67,7 @@ const CreateGame = () => {
   };
 
   return (
-    <div className="container dark:bg-gray-900">
+    <div className="bg-gray-900 p-5 rounded-lg">
       <form onSubmit={handleSubmit} className="mt-8">
         <div className="flex flex-col mb-4">
           <label htmlFor="timeControl" className="text-lg text-gray-300">
