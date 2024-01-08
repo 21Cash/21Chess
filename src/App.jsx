@@ -1,4 +1,9 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useSyncExternalStore,
+} from "react";
 import Navbar from "./components/Navbar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
@@ -17,8 +22,11 @@ import EnterPage from "./pages/EnterPage";
 import JoinGame from "./components/JoinGame";
 import Popup from "./components/Popup";
 import SpectateBox from "./pages/SpecateBox";
+import AppManager from "./components/AppManager";
+import GameRequestPopup from "./components/GameRequestPopup";
 
 function App() {
+  const [requestPopupActive, setRequestPopupActive] = useState(false);
   const [socket, setSocket] = useState(null);
   const [username, setUsername] = useState("");
   const [gameContext, setGameContext] = useState({
@@ -36,11 +44,30 @@ function App() {
     blackTime: null,
   });
 
+  const [challengeData, setChallengeData] = useState(null);
+
+  const handleRequestOnAccept = () => {
+    console.log(`Challenge Accepted`);
+    console.log(challengeData.challengeString);
+    const data = { challengeString: challengeData.challengeString };
+    socket.emit("gameRequestAccept", data);
+    setRequestPopupActive(false);
+  };
+
+  const handleRequestDecline = () => {
+    setRequestPopupActive(false);
+  };
+
   const handleClosePopup = () => {
-    setGameContext({
-      ...gameContext,
-      result: "", // Reset the result when closing the popup
-    });
+    setGameContext({ ...gameContext, result: "" });
+  };
+
+  const showRequestPopup = (reqData) => {
+    console.log(reqData);
+    const { senderName, totalTimeInSecs, incrementTimeInSecs } = reqData;
+    setChallengeData(reqData);
+
+    setRequestPopupActive(true);
   };
 
   useEffect(() => {
@@ -63,6 +90,8 @@ function App() {
         <SocketContext.Provider value={{ socket, setSocket }}>
           <GameContext.Provider value={{ gameContext, setGameContext }}>
             <Router>
+              <AppManager onGameRequest={showRequestPopup} />
+
               <div className="pt-10 bg-gray-700 h-screen">
                 <Navbar />
                 <Routes>
@@ -82,6 +111,17 @@ function App() {
             </Router>
             {gameContext.result !== "" && (
               <Popup handleClose={handleClosePopup} />
+            )}
+
+            {requestPopupActive && (
+              <GameRequestPopup
+                challengerName={challengeData.senderName}
+                format={`${challengeData.totalTimeInSecs / 60} + ${
+                  challengeData.incrementTimeInSecs
+                }`}
+                onAccept={handleRequestOnAccept}
+                onDecline={handleRequestDecline}
+              />
             )}
           </GameContext.Provider>
         </SocketContext.Provider>

@@ -30,9 +30,13 @@ const boardWrapper = {
   maxWidth: "80vh",
   margin: "3rem auto",
 };
+
+const STARTING_POSITION_FEN =
+  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
 const Game = () => {
   const game = useMemo(() => new Chess(), []);
-  const [currentPosition, setCurrentPosition] = useState(game.fen());
+  const [currentPosition, setCurrentPosition] = useState(STARTING_POSITION_FEN);
   const [opponentMoveInput, setOpponentMoveInput] = useState("");
   const chessboardRef = useRef(null);
   const { socket } = useContext(SocketContext);
@@ -47,6 +51,7 @@ const Game = () => {
   const [opponentTime, setOpponentTime] = useState(0);
   const [lastMoveSquares, setLastMoveSquares] = useState([]);
   const [kingInCheckSquare, setKingInCheckSquare] = useState(null);
+  const [showRematch, setShowRematch] = useState(false);
 
   const myColor = gameContext.myColor;
   let toMakeMoveColor = myColor;
@@ -118,6 +123,8 @@ const Game = () => {
     // This is Hot Fix, May not work in future,
     // TODO : Send Full Game State Through Server
     setGameHasStarted(false);
+    game.load(STARTING_POSITION_FEN);
+    setShowRematch(false);
 
     socket.on("moveMessage", (data) => {
       setGameHasStarted(true);
@@ -131,8 +138,6 @@ const Game = () => {
         whiteTime,
         fen,
       } = data;
-      console.log(`Move received => ${moveObj.san}`);
-      console.log(moveObj.san);
       toMakeMoveColor = color == "w" ? "b" : "w";
       updateTimers(whiteTime, blackTime);
       if (senderId == socket.id) return; // Ignore self Moves
@@ -146,16 +151,27 @@ const Game = () => {
       return () => clearInterval(interval);
     });
     socket.on("startGame", (gameData) => {
-      console.log("Game Started.");
-      const { whiteName, blackName } = gameData;
+      console.log("Start Game From Server.");
+      const { whiteName, blackName, totalTimeInSecs, incrementTimeInSecs } =
+        gameData;
+
+      console.log(gameData);
       let opponentName;
       if (username == whiteName) {
         opponentName = blackName;
       } else opponentName = whiteName;
-      setGameContext({ ...gameContext, opponent: opponentName });
+      setGameContext({
+        ...gameContext,
+        opponent: opponentName,
+        totalTimeInSecs,
+        incrementTimeInSecs,
+      });
       setGameHasStarted(true);
       console.log(`Opponent : ${opponentName}`);
       opponentUsername = opponentName;
+      game.load(STARTING_POSITION_FEN);
+      setCurrentPosition(STARTING_POSITION_FEN);
+      setShowRematch(false);
     });
 
     socket.on("endGame", (resultData) => {
@@ -179,12 +195,22 @@ const Game = () => {
         gameEndSound.play();
       }
       clearInterval(interval);
+      setShowRematch(true);
     });
   }, []);
 
   const onClickResign = () => {
     if (!gameHasStarted) return;
     socket.emit("resign");
+  };
+
+  const onClickRematch = () => {
+    const reqData = {
+      targetName: gameContext.opponent,
+      totalTimeInSecs: gameContext.totalTimeInSecs || 3,
+      incrementTimeInSecs: gameContext.incrementTimeInSecs || 0,
+    };
+    socket.emit("gameRequest", reqData);
   };
 
   const setLastMoveSquaresTo = (squares) => {
@@ -275,12 +301,22 @@ const Game = () => {
           </div>
         </div>
 
-        <button
-          onClick={onClickResign}
-          className="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50"
-        >
-          Resign
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={onClickResign}
+            className="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50"
+          >
+            Resign
+          </button>
+          {showRematch && (
+            <button
+              onClick={onClickRematch}
+              className="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50"
+            >
+              Rematch
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

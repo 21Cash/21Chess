@@ -17,6 +17,8 @@ const JoinGame = () => {
         myColor: gameData.myColor,
         gameString: gameData.gameString,
         showEval: gameData.showEval,
+        totalTimeInSecs: gameData.totalTimeInSecs,
+        incrementTimeInSecs: gameData.incrementTimeInSecs,
       });
       navigate(`/Game/${gameData.gameString}`);
     });
