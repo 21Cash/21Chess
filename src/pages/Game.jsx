@@ -248,14 +248,9 @@ const Game = () => {
     return true;
   };
   return (
-    <div className="flex bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
-      {/* Left div for chatbox */}
-      <div className="my-10 mx-5 flex-1 bg-gray-600 p-4">
-        {/* Chatbox content goes here */}
-      </div>
-
+    <div className="flex-col bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900 w-screen h-screen">
       {/* Middle div for chessboard */}
-      <div className="flex-3 flex justify-center">
+      <div className="flex-3 flex justify-center flex-grow">
         <div className="pt-5" style={boardWrapper}>
           <Chessboard
             customSquareStyles={{
@@ -278,7 +273,7 @@ const Game = () => {
           />
         </div>
       </div>
-      <div className="h-2/3 self-center my-6 mx-4 flex-1  bg-gray-500 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
+      <div className=" self-center my-6 mx-4 flex-1  bg-gray-500 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
         <div className="text-lg font-semibold text-gray-700 mb-4">
           <div className="text-black text-4xl bg-gray-600 p-4 rounded-md pt-4 font-bold">
             {!gameHasStarted ? `?? : ??` : getTimeFormattedString(opponentTime)}
