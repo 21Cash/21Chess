@@ -43,7 +43,7 @@ const EnterPage = () => {
       socket.on("userRegistered", (userData) => {
         console.log(`Register Success Username : ${userData.username}`);
         setUsername(userData.username);
-        navigate("/Home");
+        navigate("/LiveChess");
       });
 
       socket.on("userRegisterFailed", (data) => {

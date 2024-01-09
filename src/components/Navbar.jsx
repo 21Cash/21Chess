@@ -44,14 +44,24 @@ function Navbar() {
           <ul className="flex items-center space-x-10 text-sm ml-8">
             {" "}
             {/* Nav links */}
-            <li>
+            {/* <li>
               <Link
                 to="/Home"
                 className="text-gray-400 hover:text-gray-100 transition duration-300 ease-in-out"
               >
                 Home
               </Link>
-            </li>
+            </li> */}
+            {username && (
+              <li>
+                <Link
+                  to="/LiveChess"
+                  className="text-gray-400 transition duration-300 ease-in-out hover:text-gray-100"
+                >
+                  LiveChess
+                </Link>
+              </li>
+            )}
             {username && (
               <li>
                 <Link

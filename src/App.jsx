@@ -24,6 +24,7 @@ import Popup from "./components/Popup";
 import SpectateBox from "./pages/SpecateBox";
 import AppManager from "./components/AppManager";
 import GameRequestPopup from "./components/GameRequestPopup";
+import LiveChess from "./pages/LiveChess";
 
 function App() {
   const [requestPopupActive, setRequestPopupActive] = useState(false);
@@ -92,10 +93,18 @@ function App() {
             <Router>
               <AppManager onGameRequest={showRequestPopup} />
 
-              <div className="pt-10 bg-gray-700 h-screen">
+              <div className="pt-10 h-screen">
                 <Navbar />
                 <Routes>
                   <Route path="/" element={<EnterPage />} />
+                  <Route
+                    path="/LiveChess"
+                    element={
+                      <LiveChess
+                        onClickCreateGame={() => setCreateGamePopupActive(true)}
+                      />
+                    }
+                  />
                   <Route path="/spectatePage" element={<SpectateBox />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/Home" element={<Home />} />

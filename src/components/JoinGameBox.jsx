@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { GameContext, SocketContext } from "../Context";
 import { useNavigate } from "react-router-dom";
 
-const JoinGame = () => {
+const JoinGameBox = () => {
   const [inputValue, setInputValue] = useState("");
   const { socket } = useContext(SocketContext);
   const { gameContext, setGameContext } = useContext(GameContext);
@@ -45,25 +45,23 @@ const JoinGame = () => {
   };
 
   return (
-    <div className="bg-gray-900 flex items-center justify-center min-h-screen ">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-md w-2/6 py-16">
-        <input
-          className="mb-4 shadow appearance-none border rounded py-2 px-3 text-gray-700  leading-tight focus:outline-none focus:shadow-outline"
-          type="text"
-          placeholder="Enter game code"
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
-        />
-        <button
-          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          onClick={handleJoinClick}
-        >
-          Join
-        </button>
-      </div>
+    <div className="bg-gray-900 p-8 rounded-lg shadow-md py-16">
+      <input
+        className="w-full mb-4 shadow appearance-none border rounded py-2 px-3 text-gray-700  leading-tight focus:outline-none focus:shadow-outline"
+        type="text"
+        placeholder="Enter game code"
+        value={inputValue}
+        onChange={handleInputChange}
+        onKeyPress={handleKeyPress}
+      />
+      <button
+        className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        onClick={handleJoinClick}
+      >
+        Join
+      </button>
     </div>
   );
 };
 
-export default JoinGame;
+export default JoinGameBox;
