@@ -10,7 +10,7 @@ const LiveChess = () => {
 
   return (
     <div>
-      <div className="flex bg-gray-900 h-screen py-8">
+      <div className="flex bg-gradient-to-l from-gray-600 to-gray-900 h-screen py-8">
         <div className="w-4/12 bg-gray-500 mx-2 mt-5 mb-2">
           <p className="p-4"> World Chat </p>
         </div>
