@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { SpectateContext, SocketContext, GameContext } from "../Context";
+import ChatBox from "../components/ChatBox";
 import moveSoundEffect from "../media/Move.mp3";
 import captureSoundEffect from "../media/Capture.mp3";
 import gameEndSoundEffect from "../media/GameEnd.mp3";
@@ -36,7 +37,7 @@ const STARTING_POSITION_FEN =
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 const SpectateGame = () => {
-  const { gameString } = useParams();
+  const [curGameString, setCurGameString] = useState(useParams().gameString);
   const game = useMemo(() => new Chess(), []);
   const [opponentMoveInput, setOpponentMoveInput] = useState("");
   const chessboardRef = useRef(null);
@@ -195,10 +196,10 @@ const SpectateGame = () => {
   };
 
   return (
-    <div className="flex bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
-      {/* Left div for chatbox */}
-      <div className="my-10 mx-5 flex-1 bg-gray-600 p-4">
-        {/* Chatbox content goes here */}
+    <div className="h-screen flex bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
+      <div className="mt-10 mb-14 mx-5 flex-1 bg-gray-600 p-4">
+        {/*Chat Room */}
+        <ChatBox roomName={curGameString} />
       </div>
 
       {/* Middle div for chessboard */}
@@ -221,7 +222,7 @@ const SpectateGame = () => {
           />
         </div>
       </div>
-      <div className="h-2/3 self-center my-6 mx-4 flex-1  bg-gray-500 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
+      <div className="h-3/5 self-center my-6 mx-4 flex-1  bg-gray-500 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
         <div className="text-lg font-semibold text-gray-700 mb-4">
           <div className="text-black text-4xl bg-gray-600 p-4 rounded-md pt-4 font-bold">
             {getTimeFormattedString(opponentTime)}

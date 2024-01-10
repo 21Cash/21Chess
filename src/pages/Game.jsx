@@ -1,11 +1,13 @@
 import React, { useState, useRef, useMemo, useContext, useEffect } from "react";
 import { Chess } from "chess.js";
+import { useParams } from "react-router-dom";
 import { Chessboard } from "react-chessboard";
 import { GameContext, SocketContext, UserContext } from "../Context";
 import moveSoundEffect from "../media/Move.mp3";
 import captureSoundEffect from "../media/Capture.mp3";
 import gameEndSoundEffect from "../media/GameEnd.mp3";
 import drawSoundEffect from "../media/Draw.mp3";
+import ChatBox from "../components/ChatBox";
 
 const buttonStyle = {
   cursor: "pointer",
@@ -152,10 +154,14 @@ const Game = () => {
     });
     socket.on("startGame", (gameData) => {
       console.log("Start Game From Server.");
-      const { whiteName, blackName, totalTimeInSecs, incrementTimeInSecs } =
-        gameData;
+      const {
+        whiteName,
+        blackName,
+        totalTimeInSecs,
+        incrementTimeInSecs,
+        gameString,
+      } = gameData;
 
-      console.log(gameData);
       let opponentName;
       if (username == whiteName) {
         opponentName = blackName;
@@ -165,6 +171,7 @@ const Game = () => {
         opponent: opponentName,
         totalTimeInSecs,
         incrementTimeInSecs,
+        gameString,
       });
       setGameHasStarted(true);
       console.log(`Opponent : ${opponentName}`);
@@ -197,6 +204,12 @@ const Game = () => {
       clearInterval(interval);
       setShowRematch(true);
     });
+
+    return () => {
+      socket.off("moveMessage");
+      socket.off("startGame");
+      socket.off("endGame");
+    };
   }, []);
 
   const onClickResign = () => {
@@ -248,10 +261,10 @@ const Game = () => {
     return true;
   };
   return (
-    <div className="flex bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
-      {/* Left div for chatbox */}
-      <div className="my-10 mx-5 flex-1 bg-gray-600 p-4">
-        {/* Chatbox content goes here */}
+    <div className="h-screen flex bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
+      <div className="mt-10 mb-14 mx-5 flex-1 bg-gray-600 p-4">
+        {/*Chat Room */}
+        <ChatBox roomName={gameContext.gameString} />
       </div>
 
       {/* Middle div for chessboard */}
@@ -278,7 +291,7 @@ const Game = () => {
           />
         </div>
       </div>
-      <div className="h-2/3 self-center my-6 mx-4 flex-1  bg-gray-500 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
+      <div className="h-3/5 self-center my-6 mx-4 flex-1  bg-gray-500 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
         <div className="text-lg font-semibold text-gray-700 mb-4">
           <div className="text-black text-4xl bg-gray-600 p-4 rounded-md pt-4 font-bold">
             {!gameHasStarted ? `?? : ??` : getTimeFormattedString(opponentTime)}
@@ -302,12 +315,14 @@ const Game = () => {
         </div>
 
         <div className="flex gap-2">
-          <button
-            onClick={onClickResign}
-            className="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50"
-          >
-            Resign
-          </button>
+          {!showRematch && (
+            <button
+              onClick={onClickResign}
+              className="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50"
+            >
+              Resign
+            </button>
+          )}
           {showRematch && (
             <button
               onClick={onClickRematch}

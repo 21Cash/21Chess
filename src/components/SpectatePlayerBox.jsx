@@ -52,12 +52,12 @@ const SpectatePlayerBox = () => {
         value={gameCode}
         onChange={handleInputChange}
         onKeyDown={handleKeyPress}
-        placeholder="Enter Game Code"
-        className="border border-gray-300 p-2 mb-4 rounded-md"
+        placeholder="GameCode or Player"
+        className="w-full border border-gray-300 p-2 mb-4 rounded-md"
       />
       <button
         onClick={onClickSpectate}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
       >
         Spectate
       </button>

@@ -45,7 +45,7 @@ const JoinGameBox = () => {
   };
 
   return (
-    <div className="bg-gray-900 p-8 rounded-lg shadow-md py-16">
+    <div className="bg-gray-900 p-8 rounded-lg shadow-md py-8">
       <input
         className="w-full mb-4 shadow appearance-none border rounded py-2 px-3 text-gray-700  leading-tight focus:outline-none focus:shadow-outline"
         type="text"
