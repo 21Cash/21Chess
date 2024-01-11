@@ -4,8 +4,11 @@ import { UserContext } from "../Context";
 import { useNavigate } from "react-router-dom";
 
 const getTimeData = (format) => {
-  const timeData = {};
-  if (format == "Rapid") {
+  let timeData = {};
+  if (format == "HyperBullet") {
+    timeData.totalTime = 0.4;
+    timeData.timeIncrement = 0;
+  } else if (format == "Rapid") {
     timeData.totalTime = 10;
     timeData.timeIncrement = 2;
   } else if (format == "Blitz") {
@@ -14,6 +17,8 @@ const getTimeData = (format) => {
   } else if (format == "Bullet") {
     timeData.totalTime = 1;
     timeData.timeIncrement = 0;
+  } else {
+    return null;
   }
   return timeData;
 };
@@ -80,9 +85,10 @@ const CreateGame = () => {
             className="py-2 px-4 mt-1 rounded-md bg-gray-500 text-white"
           >
             <option value="">Select Time Control</option>
-            <option value="Bullet">Bullet</option>
-            <option value="Rapid">Rapid</option>
-            <option value="Blitz">Blitz</option>
+            <option value="HyperBullet">Hyperbullet (1/2 + 0)</option>
+            <option value="Bullet">Bullet (1 + 0)</option>
+            <option value="Rapid">Rapid (10 + 2)</option>
+            <option value="Blitz">Blitz (3 + 2) </option>
           </select>
         </div>
 
@@ -106,6 +112,7 @@ const CreateGame = () => {
           <input
             type="text"
             id="targetOpponent"
+            placeholder="To Challenge Player Name (Optional)"
             value={targetOpponent}
             onChange={(e) => setTargetOpponent(e.target.value)}
             className="py-2 px-4 mt-1 rounded-md bg-gray-500 text-white"

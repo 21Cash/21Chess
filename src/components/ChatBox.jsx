@@ -49,7 +49,7 @@ const ChatBox = ({ roomName }) => {
     <div className="parent-container h-full flex flex-col">
       <div
         ref={chatBoxRef}
-        className="chat-box bg-gray-600 rounded-t-md flex-1 overflow-y-auto pb-4"
+        className="chat-box bg-gray-700 rounded-t-md flex-1 overflow-y-auto pb-4"
       >
         {messages.map((message, index) => (
           <div

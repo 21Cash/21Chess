@@ -15,6 +15,7 @@ const AppManager = ({ onGameRequest }) => {
     if (socket) {
       socket.on("ServerGame", (gameData) => {
         console.log("Server Game received");
+        console.log(gameData);
         const {
           myColor,
           opponentName,

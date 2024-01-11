@@ -55,8 +55,7 @@ const Game = () => {
   const [kingInCheckSquare, setKingInCheckSquare] = useState(null);
   const [showRematch, setShowRematch] = useState(false);
 
-  const myColor = gameContext.myColor;
-  let toMakeMoveColor = myColor;
+  const [myColor, setMyColor] = useState(gameContext.myColor);
   let opponentUsername;
   let interval;
 
@@ -82,7 +81,7 @@ const Game = () => {
     }
     clearInterval(interval);
     interval = setInterval(() => {
-      if (myColor == toMakeMoveColor) {
+      if (myColor == game.turn()) {
         setMyTime((prevTime) => Math.max(prevTime - 1000, 0));
       } else {
         setOpponentTime((prevTime) => Math.max(prevTime - 1000, 0));
@@ -127,6 +126,7 @@ const Game = () => {
     setGameHasStarted(false);
     game.load(STARTING_POSITION_FEN);
     setShowRematch(false);
+    updateTimers();
 
     socket.on("moveMessage", (data) => {
       setGameHasStarted(true);
@@ -140,7 +140,6 @@ const Game = () => {
         whiteTime,
         fen,
       } = data;
-      toMakeMoveColor = color == "w" ? "b" : "w";
       updateTimers(whiteTime, blackTime);
       if (senderId == socket.id) return; // Ignore self Moves
 
@@ -162,10 +161,16 @@ const Game = () => {
         gameString,
       } = gameData;
 
+      console.log(gameData);
+
       let opponentName;
       if (username == whiteName) {
         opponentName = blackName;
       } else opponentName = whiteName;
+      console.log(`USERNAME : ${username}`);
+      const newColor = username == whiteName ? "w" : "b";
+      console.log(`Setting New color To ${newColor}`);
+      setMyColor(newColor);
       setGameContext({
         ...gameContext,
         opponent: opponentName,
@@ -262,7 +267,7 @@ const Game = () => {
   };
   return (
     <div className="h-screen flex bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
-      <div className="mt-10 mb-14 mx-5 flex-1 bg-gray-600 p-4">
+      <div className="mt-10 mb-14 mx-5 flex-1 bg-gray-700 p-4">
         {/*Chat Room */}
         <ChatBox roomName={gameContext.gameString} />
       </div>
@@ -286,7 +291,7 @@ const Game = () => {
             }}
             ref={chessboardRef}
             allowDragOutsideBoard={false}
-            boardOrientation={myColor === "w" ? "white" : "black"}
+            boardOrientation={myColor == "w" ? "white" : "black"}
             animationDuration={200}
           />
         </div>
@@ -339,6 +344,7 @@ const Game = () => {
 
 // Debuggine Purpose Code
 const getTimeFormattedString = (timeInMs) => {
+  if (!timeInMs) return "00 : 00";
   const remainingTime = timeInMs;
   const minutes = Math.floor(remainingTime / 60000);
   const seconds = ((remainingTime % 60000) / 1000).toFixed(0).padStart(2, "0");

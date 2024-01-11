@@ -5,22 +5,25 @@ import SpectatePlayerBox from "../components/SpectatePlayerBox";
 import MainFooter from "../components/MainFooter";
 import CreateGamePopup from "../components/CreateGamePopup";
 import ChatBox from "../components/ChatBox";
+import RandomBoard from "../components/RandomBoard";
 
 const LiveChess = () => {
   const [createGamePopupActive, setCreateGamePopupActive] = useState(false);
-
   return (
-    <div>
-      <div className="flex bg-gray-900 h-[90vh] py-5">
-        <div className="w-4/12 bg-gray-600 mx-2 mt-5 mb-2 rounded-md my-10 p-3">
+    <div className="h-full pt-5">
+      <div className="flex bg-gray-900 h-[90vh] py-5 px-5 justify-between">
+        <div className="w-3/12 bg-gray-700 mx-2 mt-5 mb-2 rounded-md my-10 p-3">
           {/* <p className="p-4"> World Chat </p> */}
+
           <ChatBox roomName="Global" />
         </div>
-        <div className="w-6/12 bg-gray-600 rounded-md mx-2 mt-5 mb-2">
-          <p className="p-4"> Open Games</p>
+        <div className="flex h-9/10 flex-col justify-center w-5/12 rounded-md aspect-w-[1] mt-5">
+          <div className="h-80% flex justify-center">
+            <RandomBoard />
+          </div>
         </div>
 
-        <div className="flex flex-col justify-evenly w-4/12 bg-gray-600 mx-2 mt-5 mb-2 space-y-6 rounded-md">
+        <div className="flex flex-col justify-evenly w-3/12 bg-gray-700 mx-2 mt-5 mb-2 space-y-6 rounded-md">
           <div className="px-2 pt-4 mx-3">
             <JoinGameBox />
           </div>

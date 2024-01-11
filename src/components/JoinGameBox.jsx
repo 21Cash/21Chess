@@ -49,7 +49,7 @@ const JoinGameBox = () => {
       <input
         className="w-full mb-4 shadow appearance-none border rounded py-2 px-3 text-gray-700  leading-tight focus:outline-none focus:shadow-outline"
         type="text"
-        placeholder="Enter game code"
+        placeholder="Game Code or Player"
         value={inputValue}
         onChange={handleInputChange}
         onKeyPress={handleKeyPress}

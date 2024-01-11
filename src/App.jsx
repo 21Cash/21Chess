@@ -25,6 +25,7 @@ import SpectateBox from "./pages/SpecateBox";
 import AppManager from "./components/AppManager";
 import GameRequestPopup from "./components/GameRequestPopup";
 import LiveChess from "./pages/LiveChess";
+import ScreenSaver from "./pages/ScreenSaver";
 
 function App() {
   const [requestPopupActive, setRequestPopupActive] = useState(false);
@@ -96,6 +97,7 @@ function App() {
               <div className="pt-10 h-screen">
                 <Navbar />
                 <Routes>
+                  <Route path="/ScreenSaver" element={<ScreenSaver />} />
                   <Route path="/" element={<EnterPage />} />
                   <Route
                     path="/LiveChess"
