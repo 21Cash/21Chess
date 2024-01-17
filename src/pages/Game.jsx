@@ -71,7 +71,7 @@ const Game = () => {
     }
   };
 
-  const updateTimers = (whiteTimerInMs, blackTimeInMs) => {
+  const updateTimers = (whiteTimerInMs, blackTimeInMs, moveColor) => {
     if (myColor == "w") {
       setMyTime(whiteTimerInMs);
       setOpponentTime(blackTimeInMs);
@@ -126,7 +126,6 @@ const Game = () => {
     setGameHasStarted(false);
     game.load(STARTING_POSITION_FEN);
     setShowRematch(false);
-    updateTimers();
 
     socket.on("moveMessage", (data) => {
       setGameHasStarted(true);
@@ -140,7 +139,7 @@ const Game = () => {
         whiteTime,
         fen,
       } = data;
-      updateTimers(whiteTime, blackTime);
+      updateTimers(whiteTime, blackTime, moveObj.color);
       if (senderId == socket.id) return; // Ignore self Moves
 
       game.move(moveObj);
