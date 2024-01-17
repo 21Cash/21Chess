@@ -23,17 +23,13 @@ const LiveChess = () => {
           </div>
         </div>
 
-        <div className="flex flex-col justify-evenly w-full sm:w-3/12 bg-gray-700 mx-2 mt-5 mb-2 space-y-6 rounded-md">
-          <div className="px-2 pt-4 mx-3">
+        <div className="w-full sm:w-3/12 bg-gray-700 mx-2 mt-5 mb-2 rounded-md">
+          <div className="h-full p-6 flex flex-col justify-evenly space-y-6">
             <JoinGameBox />
-          </div>
 
-          <div className="px-2 mx-3">
             <CreateGameBox
               onClickCreateGame={() => setCreateGamePopupActive(true)}
             />
-          </div>
-          <div className="px-2 mx-3">
             <SpectatePlayerBox />
           </div>
         </div>
