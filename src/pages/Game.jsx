@@ -58,7 +58,7 @@ const Game = () => {
 
   const [myColor, setMyColor] = useState(gameContext.myColor);
   const [moveFromSquare, setMoveFromSquare] = useState("");
-
+  const [resultText, setResultText] = useState("");
   let opponentUsername;
   let interval;
 
@@ -150,7 +150,7 @@ const Game = () => {
     setGameHasStarted(false);
     game.load(STARTING_POSITION_FEN);
     setShowRematch(false);
-
+    setResultText("");
     socket.on("moveMessage", (data) => {
       setGameHasStarted(true);
       const {
@@ -185,6 +185,7 @@ const Game = () => {
       } = gameData;
 
       console.log(gameData);
+      setResultText("");
 
       let opponentName;
       if (username == whiteName) {
@@ -228,6 +229,14 @@ const Game = () => {
           pgn,
         });
         gameEndSound.play();
+      }
+
+      if (isDraw) {
+        setResultText("Draw • 1/2 - 1/2");
+      } else if (winColor == "w") {
+        setResultText("White is Victorious • 1-0");
+      } else {
+        setResultText("Black is Victorious • 0-1");
       }
       clearInterval(interval);
       setShowRematch(true);
@@ -353,6 +362,8 @@ const Game = () => {
       <div className="flex-3 flex justify-center">
         <div className="pt-5" style={boardWrapper}>
           <Chessboard
+            customDarkSquareStyle={{ backgroundColor: "#71818f" }}
+            customLightSquareStyle={{ backgroundColor: "#c8c7c8" }}
             customSquareStyles={{
               ...lastMoveSquares,
               ...kingInCheckSquare,
@@ -399,7 +410,11 @@ const Game = () => {
             </div>
           </div>
         </div>
-
+        {resultText && (
+          <div className="bg-gray-800 py-2 px-6 my-3 rounded-md text-white ">
+            {resultText}
+          </div>
+        )}
         <div className="flex gap-2">
           {!showRematch && (
             <button

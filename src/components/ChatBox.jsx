@@ -10,8 +10,6 @@ const ChatBox = ({ roomName }) => {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    setMessages([]);
-
     socket.on("chatMessage", (msgData) => {
       const { sender, msg } = msgData;
       if (roomName != msgData.roomName) return;

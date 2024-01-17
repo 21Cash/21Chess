@@ -58,6 +58,7 @@ const SpectateGame = () => {
   const [opponentTime, setOpponentTime] = useState(spectateContext.blackTime);
   const [lastMoveSquares, setLastMoveSquares] = useState([]);
   const [kingInCheckSquare, setKingInCheckSquare] = useState(null);
+  const [resultText, setResultText] = useState("");
 
   const myColor = "w";
   let toMakeMoveColor = myColor;
@@ -131,11 +132,13 @@ const SpectateGame = () => {
 
   useEffect(() => {
     console.log(`Use Effect Being Called`);
+    setResultText("");
     // This is Hot Fix, May not work in future,
     // TODO : Send Full Game State Through Server
     setGameHasStarted(false);
 
     socket.on("moveMessage", (data) => {
+      setResultText("");
       setGameHasStarted(true);
       const {
         senderId,
@@ -183,6 +186,14 @@ const SpectateGame = () => {
         });
         gameEndSound.play();
       }
+
+      if (isDraw) {
+        setResultText("Draw • 1/2 - 1/2");
+      } else if (winColor == "w") {
+        setResultText("White is Victorious • 1-0");
+      } else {
+        setResultText("Black is Victorious • 0-1");
+      }
       clearInterval(interval);
     });
   }, []);
@@ -205,6 +216,8 @@ const SpectateGame = () => {
       <div className="flex-3 flex justify-center">
         <div style={boardWrapper}>
           <Chessboard
+            customDarkSquareStyle={{ backgroundColor: "#71818f" }}
+            customLightSquareStyle={{ backgroundColor: "#c8c7c8" }}
             customSquareStyles={{
               ...lastMoveSquares,
               ...kingInCheckSquare,
@@ -241,6 +254,11 @@ const SpectateGame = () => {
             <div className="text-black text-4xl bg-gray-600 p-4 rounded-md font-bold">
               {getTimeFormattedString(myTime)}
             </div>
+            {resultText && (
+              <div className="bg-gray-800 py-2 px-6 my-3 rounded-md text-white ">
+                {resultText}
+              </div>
+            )}
           </div>
         </div>
       </div>

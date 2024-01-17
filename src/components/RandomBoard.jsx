@@ -121,6 +121,8 @@ const RandomBoard = () => {
           ...lastMoveSquares,
           ...kingInCheckSquare,
         }}
+        customDarkSquareStyle={{ backgroundColor: "#71818f" }}
+        customLightSquareStyle={{ backgroundColor: "#c8c7c8" }}
         position={currentPosition}
         customBoardStyle={{
           borderRadius: "4px",
