@@ -67,51 +67,54 @@ const EnterPage = () => {
   };
 
   return (
-    <div className="h-screen bg-gray-900 to-gray-900 text-white flex flex-col justify-between pt-20">
-      {loading ? (
-        <div className="flex items-center justify-center h-screen">
-          <p className="text-4xl">Loading...</p>
-          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white ml-3"></div>
-        </div>
-      ) : error ? (
-        <div className="flex text-4xl items-center justify-center h-screen">
-          <p>Couldn't connect to the server.</p>
-        </div>
-      ) : (
-        <div className="max-w-4xl mx-auto flex flex-col items-center justify-center py-16">
-          <h1 className="text-6xl font-bold mb-4">21Chess</h1>
-          <p className="text-lg text-center mb-6">Minimalistic Online Chess</p>
-          <p className="text-sm text-center mb-8">
-            Free and lightweight Chess Platform
-          </p>
-          {/* Removed the form, directly handle onClick on the button */}
-          <div className="flex items-center mb-8">
-            <input
-              type="text"
-              placeholder="Enter your username"
-              className="bg-gray-800 border border-gray-700 rounded-l px-4 py-3 outline-none focus:border-blue-500 w-64"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleEnter();
-                }
-              }}
-            />
-            <button
-              type="button"
-              onClick={handleEnter}
-              className="bg-blue-500 text-white px-4 py-3 rounded-r hover:bg-blue-600 transition duration-300 ml-2"
-            >
-              Enter
-            </button>
+    <div>
+      <div className="bg-gray-900 to-gray-900 text-white flex items-center justify-center h-[85vh] mt-6">
+        {loading ? (
+          <div className="flex items-center justify-center h-screen">
+            <p className="text-4xl">Loading...</p>
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white ml-3"></div>
           </div>
-          <div className="text-center">
-            <p>Server Status: {serverStatus}</p>
-            <p>{playersOnline} players Online</p>
+        ) : error ? (
+          <div className="flex text-4xl items-center justify-center h-screen">
+            <p>Couldn't connect to the server.</p>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="max-w-4xl mx-auto flex flex-col items-center justify-center py-16">
+            <h1 className="text-6xl font-bold mb-4">21Chess</h1>
+            <p className="text-lg text-center mb-6">
+              Minimalistic Online Chess
+            </p>
+            <p className="text-sm text-center mb-8">
+              Free and lightweight Chess Platform
+            </p>
+            <div className="flex items-end justify-end mb-8">
+              <input
+                type="text"
+                placeholder="Enter your username"
+                className="bg-gray-800 border border-gray-700 rounded-l px-4 py-3 outline-none focus:border-blue-500 w-64"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleEnter();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleEnter}
+                className="bg-blue-500 text-white px-4 py-3 rounded-r hover:bg-blue-600 transition duration-300 ml-2"
+              >
+                Enter
+              </button>
+            </div>
+            <div className="text-center">
+              <p>Server Status: {serverStatus}</p>
+              <p>{playersOnline} players Online</p>
+            </div>
+          </div>
+        )}
+      </div>
 
       <footer className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-center py-4">
         <p className="text-gray-400">
