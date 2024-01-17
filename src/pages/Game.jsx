@@ -344,7 +344,7 @@ const Game = () => {
 
   return (
     <div className="h-screen flex flex-col md:flex-row bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
-      <div className="hidden sm:flex mt-10 mb-14 mx-5 flex-1 bg-gray-700 p-4">
+      <div className="hidden sm:block mt-10 mb-14 mx-5 flex-1 bg-gray-700 p-4">
         {/*Chat Room */}
         <ChatBox roomName={gameContext.gameString} />
       </div>
