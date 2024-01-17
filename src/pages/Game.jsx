@@ -53,9 +53,12 @@ const Game = () => {
   const [opponentTime, setOpponentTime] = useState(0);
   const [lastMoveSquares, setLastMoveSquares] = useState([]);
   const [kingInCheckSquare, setKingInCheckSquare] = useState(null);
+  const [possibleMovesSquares, setPossibleMoveSquares] = useState(null);
   const [showRematch, setShowRematch] = useState(false);
 
   const [myColor, setMyColor] = useState(gameContext.myColor);
+  const [moveFromSquare, setMoveFromSquare] = useState("");
+
   let opponentUsername;
   let interval;
 
@@ -117,6 +120,27 @@ const Game = () => {
     } else {
       setKingInCheckSquare(null);
     }
+  };
+
+  const makeMove = (fromSquare, toSquare) => {
+    const moveObj = { from: fromSquare, to: toSquare };
+    const res = game.move(moveObj);
+    if (!res) return;
+
+    // Emit
+    const moveData = {
+      gameString: gameContext.gameString,
+      color: myColor,
+      moveObj: res,
+    };
+
+    socket.emit("sendMove", moveData);
+
+    setCurrentPosition(game.fen());
+    handleMoveSound(res);
+    setLastMoveSquaresTo([res.from, res.to]);
+    setPossibleMoveSquares([]);
+    updateKingInCheckSquare();
   };
 
   useEffect(() => {
@@ -240,7 +264,7 @@ const Game = () => {
 
   const onDrop = (sourceSquare, targetSquare, piece) => {
     if (!gameHasStarted) return false; // if Game Hasnt begun, Dont make move
-
+    setPossibleMoveSquares(null);
     const moveObject = {
       from: sourceSquare,
       to: targetSquare,
@@ -264,6 +288,60 @@ const Game = () => {
     handleMoveSound(move);
     return true;
   };
+
+  const getMoveOptions = (square) => {
+    const moves = game.moves({
+      square,
+      verbose: true,
+    });
+    if (moves.length === 0) {
+      // setOptionSquares({});
+      return false;
+    }
+
+    const newSquares = {};
+
+    moves.map((move) => {
+      newSquares[move.to] = {
+        background:
+          game.get(move.to) &&
+          game.get(move.to).color !== game.get(square).color
+            ? "radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)"
+            : "radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)",
+        borderRadius: "50%",
+      };
+      return move;
+    });
+
+    newSquares[square] = {
+      background: "rgba(255, 255, 0, 0.4)",
+    };
+    setPossibleMoveSquares(newSquares);
+
+    // Set Start Square
+    setMoveFromSquare(square);
+    return true;
+  };
+
+  const onPieceDragBegin = (piece, sourceSquare) => {
+    getMoveOptions(sourceSquare);
+  };
+
+  const onSquareClick = (square) => {
+    if (game.get(square) != null && game.get(square).color == myColor) {
+      getMoveOptions(square);
+      return;
+    }
+
+    if (possibleMovesSquares.hasOwnProperty(square)) {
+      makeMove(moveFromSquare, square);
+    }
+  };
+
+  const onSquareRightClick = (square) => {
+    setPossibleMoveSquares([]);
+  };
+
   return (
     <div className="h-screen flex bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
       <div className="mt-10 mb-14 mx-5 flex-1 bg-gray-700 p-4">
@@ -278,8 +356,12 @@ const Game = () => {
             customSquareStyles={{
               ...lastMoveSquares,
               ...kingInCheckSquare,
+              ...possibleMovesSquares,
             }}
             id="PremovesEnabled"
+            onPieceDragBegin={onPieceDragBegin}
+            onSquareClick={onSquareClick}
+            onSquareRightClick={onSquareRightClick}
             arePremovesAllowed={true}
             position={currentPosition}
             isDraggablePiece={({ piece }) => piece[0] === myColor[0]}
