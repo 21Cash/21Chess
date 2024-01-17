@@ -12,18 +12,18 @@ const LiveChess = () => {
   return (
     <div className="h-full pt-5">
       <div className="flex bg-gray-900 h-[90vh] py-5 px-5 justify-between">
-        <div className="w-3/12 bg-gray-700 mx-2 mt-5 mb-2 rounded-md my-10 p-3">
+        <div className="hidden sm:block w-3/12 bg-gray-700 mx-2 mt-5 mb-2 rounded-md my-10 p-3">
           {/* <p className="p-4"> World Chat </p> */}
 
           <ChatBox roomName="Global" />
         </div>
-        <div className="flex h-9/10 flex-col justify-center w-5/12 rounded-md aspect-w-[1] mt-5">
+        <div className="hidden sm:flex h-9/10 flex-col justify-center w-5/12 rounded-md aspect-w-[1] mt-5">
           <div className="h-80% flex justify-center">
             <RandomBoard />
           </div>
         </div>
 
-        <div className="flex flex-col justify-evenly w-3/12 bg-gray-700 mx-2 mt-5 mb-2 space-y-6 rounded-md">
+        <div className="flex flex-col justify-evenly w-full sm:w-3/12 bg-gray-700 mx-2 mt-5 mb-2 space-y-6 rounded-md">
           <div className="px-2 pt-4 mx-3">
             <JoinGameBox />
           </div>
