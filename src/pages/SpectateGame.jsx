@@ -64,7 +64,7 @@ const SpectateGame = () => {
   const [resultText, setResultText] = useState("");
 
   const myColor = "w";
-  let toMakeMoveColor = myColor;
+  const [toMakeMoveColor, setToMakeMoveColor] = useState(myColor);
   let opponentUsername;
   let interval;
 
@@ -176,7 +176,7 @@ const SpectateGame = () => {
       } = data;
 
       console.log(`Move received => ${moveObj.san}`);
-      toMakeMoveColor = color == "w" ? "b" : "w";
+      setToMakeMoveColor(color == "w" ? "b" : "w");
       updateTimers(whiteTime, blackTime);
 
       // Update game, so that we can know checks
@@ -282,13 +282,13 @@ const SpectateGame = () => {
             animationDuration={200}
           />
         </div>
-        <div className="h-auto my-12 mx-5 flex-1 ">
+        <div className="h-[80vh] my-12 mx-5 flex-1 ">
           <EvaluationBar
             positionEvaluation={
               possibleMate
                 ? toMakeMoveColor == "w"
-                  ? 20
-                  : -20
+                  ? 40
+                  : -40
                 : positionEvaluation
             }
             colorToPlay={toMakeMoveColor}
