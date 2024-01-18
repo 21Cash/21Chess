@@ -3,11 +3,13 @@ import { useParams } from "react-router-dom";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { SpectateContext, SocketContext, GameContext } from "../Context";
+import Engine from "../../public/engine";
 import ChatBox from "../components/ChatBox";
 import moveSoundEffect from "../media/Move.mp3";
 import captureSoundEffect from "../media/Capture.mp3";
 import gameEndSoundEffect from "../media/GameEnd.mp3";
 import drawSoundEffect from "../media/Draw.mp3";
+import EvaluationBar from "../components/EvaluationBar";
 
 const buttonStyle = {
   cursor: "pointer",
@@ -39,6 +41,7 @@ const STARTING_POSITION_FEN =
 const SpectateGame = () => {
   const [curGameString, setCurGameString] = useState(useParams().gameString);
   const game = useMemo(() => new Chess(), []);
+  const engine = useMemo(() => new Engine(), []);
   const [opponentMoveInput, setOpponentMoveInput] = useState("");
   const chessboardRef = useRef(null);
   const { spectateContext } = useContext(SpectateContext);
@@ -69,6 +72,27 @@ const SpectateGame = () => {
   const [captureSound] = useState(new Audio(captureSoundEffect));
   const [gameEndSound] = useState(new Audio(gameEndSoundEffect));
   const [drawSound] = useState(new Audio(drawSoundEffect));
+
+  const [positionEvaluation, setPositionEvaluation] = useState(0);
+  const [depth, setDepth] = useState(10);
+  const [bestLine, setBestline] = useState("");
+  const [possibleMate, setPossibleMate] = useState("");
+  const bestMove = bestLine?.split(" ")?.[0];
+
+  function findBestMove(fenPosition) {
+    engine.evaluatePosition(fenPosition, 16);
+
+    engine.onMessage(({ positionEvaluation, possibleMate, pv, depth }) => {
+      if (depth < 10) return;
+      positionEvaluation &&
+        setPositionEvaluation(
+          ((game.turn() === "w" ? 1 : -1) * Number(positionEvaluation)) / 100
+        );
+      possibleMate && setPossibleMate(possibleMate);
+      depth && setDepth(depth);
+      pv && setBestline(pv);
+    });
+  }
 
   const handleMoveSound = async (moveObj) => {
     const isCapture = moveObj.flags.includes("c");
@@ -163,6 +187,13 @@ const SpectateGame = () => {
       setLastMoveSquaresTo([moveObj.from, moveObj.to]);
       updateKingInCheckSquare();
 
+      setPossibleMate("");
+      setBestline("");
+
+      if (fen != currentPosition) {
+        engine.stop();
+        findBestMove(fen);
+      }
       return () => clearInterval(interval);
     });
 
@@ -205,17 +236,35 @@ const SpectateGame = () => {
     // update last moves State
     setLastMoveSquares(hightlightSquares);
   };
-
   return (
     <div className="h-auto flex flex-col sm:flex-row bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
       <div className="h-[85vh] order-last sm:order-first mt-10 mb-14 mx-5 flex-1 bg-gray-700 p-4">
         <ChatBox roomName={curGameString} />
+        {/* <div>
+          <h4>
+            Position Evaluation:{" "}
+            {possibleMate ? `#${possibleMate}` : positionEvaluation}
+            {"; "}
+            Depth: {depth}
+          </h4>
+          <h5>
+            Best line: <i>{bestLine.slice(0, 40)}</i> ...
+          </h5>
+        </div> */}
       </div>
 
-      {/* Middle div for chessboard */}
       <div className="flex-3 flex justify-center">
         <div style={boardWrapper}>
           <Chessboard
+            customArrows={
+              bestMove && [
+                [
+                  bestMove.substring(0, 2),
+                  bestMove.substring(2, 4),
+                  "rgb(0, 128, 0)",
+                ],
+              ]
+            }
             customDarkSquareStyle={{ backgroundColor: "#71818f" }}
             customLightSquareStyle={{ backgroundColor: "#c8c7c8" }}
             customSquareStyles={{
@@ -233,7 +282,20 @@ const SpectateGame = () => {
             animationDuration={200}
           />
         </div>
+        <div className="h-auto my-12 mx-5 flex-1 ">
+          <EvaluationBar
+            positionEvaluation={
+              possibleMate
+                ? toMakeMoveColor == "w"
+                  ? 20
+                  : -20
+                : positionEvaluation
+            }
+            colorToPlay={toMakeMoveColor}
+          />
+        </div>
       </div>
+
       <div className="h-3/5 self-center my-6 mx-4 flex-1  bg-gray-500 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
         <div className="text-lg font-semibold text-gray-700 mb-4">
           <div className="text-black text-4xl bg-gray-600 p-4 rounded-md pt-4 font-bold">
