@@ -8,7 +8,7 @@ function Button({ text, bg, padding }) {
     <div>
       <button
         className={`
-          ${padding || "px-6 py-2"} text-sm font-semibold uppercase 
+          ${padding || "px-6 py-2"} text-sm font-semibold  
           rounded-sm text-white transition ${bg}`}
       >
         <span>{text}</span>

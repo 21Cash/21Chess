@@ -364,6 +364,12 @@ const Game = () => {
           <Chessboard
             customDarkSquareStyle={{ backgroundColor: "#71818f" }}
             customLightSquareStyle={{ backgroundColor: "#c8c7c8" }}
+            customPremoveDarkSquareStyle={{
+              backgroundColor: "rgb(239, 68, 68)",
+            }}
+            customPremoveLightSquareStyle={{
+              backgroundColor: "rgb(239, 68, 68)",
+            }}
             customSquareStyles={{
               ...lastMoveSquares,
               ...kingInCheckSquare,

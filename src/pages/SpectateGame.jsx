@@ -238,7 +238,7 @@ const SpectateGame = () => {
   };
   return (
     <div className="h-auto flex flex-col sm:flex-row bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
-      <div className="h-[85vh] order-last sm:order-first mt-10 mb-14 mx-5 flex-1 bg-gray-700 p-4">
+      <div className="h-[85vh] w-[90vw] sm:w-1/4 order-last sm:order-first mt-10 mb-14 mx-5 flex-1 bg-gray-700 p-4">
         <ChatBox roomName={curGameString} />
         {/* <div>
           <h4>
@@ -253,7 +253,7 @@ const SpectateGame = () => {
         </div> */}
       </div>
 
-      <div className="flex-3 flex justify-center">
+      <div className="flex-3 sm:ml-8 flex justify-center">
         <div style={boardWrapper}>
           <Chessboard
             customArrows={
@@ -282,7 +282,7 @@ const SpectateGame = () => {
             animationDuration={200}
           />
         </div>
-        <div className="h-[80vh] my-12 mx-5 flex-1 ">
+        <div className="my-12 mr-3 ml-8 flex-1 ">
           <EvaluationBar
             positionEvaluation={
               possibleMate
