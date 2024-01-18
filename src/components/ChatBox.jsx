@@ -46,7 +46,7 @@ const ChatBox = ({ roomName }) => {
   };
 
   return (
-    <div className="parent-container h-full flex flex-col">
+    <div className="parent-container h-full w-full flex flex-col">
       <div
         ref={chatBoxRef}
         className="chat-box bg-gray-700 rounded-t-md flex-1 overflow-y-auto pb-4"
@@ -56,8 +56,8 @@ const ChatBox = ({ roomName }) => {
             key={index}
             className={
               message.sender === myUsername
-                ? "my-message rounded-lg p-2 text-sm"
-                : "other-message rounded-lg p-2 text-sm"
+                ? "my-message rounded-lg p-2 text-sm break-words"
+                : "other-message rounded-lg p-2 text-sm break-words"
             }
           >
             {message.sender === myUsername && (
