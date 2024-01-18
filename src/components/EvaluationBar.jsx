@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const EvaluationBar = ({
-  positionEvaluation,
-  colorToPlay = "w",
-  showEvaluationText = true,
-}) => {
+const EvaluationBar = ({ positionEvaluation, colorToPlay = "w" }) => {
   const evalValue = parseFloat(positionEvaluation);
   const [percentage, setPercentage] = useState(50);
 
@@ -12,7 +8,6 @@ const EvaluationBar = ({
   const targetPercentageRef = useRef(50);
 
   useEffect(() => {
-    console.log(evalValue);
     if (evalValue > 40) {
       targetPercentageRef.current = 100;
       console.log(`White Mate`);
@@ -20,7 +15,7 @@ const EvaluationBar = ({
       console.log(`Black Neg`);
       targetPercentageRef.current = 0;
     } else {
-      targetPercentageRef.current = 50 + (evalValue / 3) * 20;
+      targetPercentageRef.current = 50 + (evalValue / 4) * 20;
     }
   }, [evalValue]);
 
@@ -85,15 +80,16 @@ const EvaluationBar = ({
 
   return (
     <div className="flex h-full w-2 flex-col items-center relative">
-      {showEvaluationText && (
-        <div className="text-xs text-green-500 font-bold text-center">
-          {positionEvaluation >= 40 || positionEvaluation <= -40
-            ? "∞"
-            : positionEvaluation}
-        </div>
-      )}
+      <div className="text-xs text-green-500 font-bold ">
+        {positionEvaluation >= 40 || positionEvaluation <= -40
+          ? "∞"
+          : positionEvaluation}
+      </div>
       <div
-        style={{ background: barColor }}
+        style={{
+          background: barColor,
+          transform: "rotate(180deg)",
+        }}
         className="h-full w-4 border rounded-md overflow-hidden relative"
       >
         <div style={lineStyle}></div>

@@ -323,7 +323,7 @@ const Game = () => {
     });
 
     newSquares[square] = {
-      background: "rgba(255, 255, 0, 0.4)",
+      background: "rgba(167, 243, 208, 0.6)",
     };
     setPossibleMoveSquares(newSquares);
 
