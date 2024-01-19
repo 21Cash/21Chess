@@ -3,13 +3,12 @@ import { useParams } from "react-router-dom";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { SpectateContext, SocketContext, GameContext } from "../Context";
-import Engine from "../../public/engine";
 import ChatBox from "../components/ChatBox";
 import moveSoundEffect from "../media/Move.mp3";
 import captureSoundEffect from "../media/Capture.mp3";
 import gameEndSoundEffect from "../media/GameEnd.mp3";
 import drawSoundEffect from "../media/Draw.mp3";
-import EvaluationBar from "../components/EvaluationBar";
+import AutoEvaluationBar from "../components/AutoEvaluationBar";
 
 const buttonStyle = {
   cursor: "pointer",
@@ -41,7 +40,6 @@ const STARTING_POSITION_FEN =
 const SpectateGame = () => {
   const [curGameString, setCurGameString] = useState(useParams().gameString);
   const game = useMemo(() => new Chess(), []);
-  const engine = useMemo(() => new Engine(), []);
   const [opponentMoveInput, setOpponentMoveInput] = useState("");
   const chessboardRef = useRef(null);
   const { spectateContext } = useContext(SpectateContext);
@@ -74,7 +72,6 @@ const SpectateGame = () => {
   const [drawSound] = useState(new Audio(drawSoundEffect));
 
   const [positionEvaluation, setPositionEvaluation] = useState(0);
-  const [depth, setDepth] = useState(10);
   const [bestLine, setBestline] = useState("");
   const [possibleMate, setPossibleMate] = useState("");
   const bestMove = bestLine?.split(" ")?.[0];
@@ -94,28 +91,6 @@ const SpectateGame = () => {
       clearInterval(intervalRef.current);
     };
   }, [toMakeMoveColor]);
-
-  function findBestMove(fenPosition) {
-    engine.evaluatePosition(fenPosition, 16);
-
-    engine.onMessage(
-      ({ positionEvaluation, possibleMate, pv, depth, forcedWinColor }) => {
-        if (depth < 10) return;
-        positionEvaluation &&
-          setPositionEvaluation(
-            ((toMakeMoveColor === "w" ? 1 : -1) * Number(positionEvaluation)) /
-              100
-          );
-
-        if (forcedWinColor) {
-          setPositionEvaluation(forcedWinColor == "w" ? 40 : -40);
-        }
-        possibleMate && setPossibleMate(possibleMate);
-        depth && setDepth(depth);
-        pv && setBestline(pv);
-      }
-    );
-  }
 
   const handleMoveSound = async (moveObj) => {
     const isCapture = moveObj.flags.includes("c");
@@ -205,10 +180,6 @@ const SpectateGame = () => {
       setPossibleMate("");
       setBestline("");
 
-      if (fen != currentPosition) {
-        engine.stop();
-        findBestMove(fen);
-      }
       return () => clearInterval(intervalRef.current);
     });
 
@@ -298,15 +269,9 @@ const SpectateGame = () => {
           />
         </div>
         <div className="my-12 mr-3 ml-8 flex-1 ">
-          <EvaluationBar
-            positionEvaluation={
-              possibleMate
-                ? toMakeMoveColor == "w"
-                  ? 40
-                  : -40
-                : positionEvaluation
-            }
-            colorToPlay={toMakeMoveColor}
+          <AutoEvaluationBar
+            fen={currentPosition}
+            onBestLineFound={setBestline}
           />
         </div>
       </div>

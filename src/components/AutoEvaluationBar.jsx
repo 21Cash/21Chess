@@ -1,18 +1,46 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import Engine from "../../public/engine";
+import { Chess } from "chess.js";
 
-const EvaluationBar = ({ positionEvaluation, colorToPlay = "w" }) => {
+const AutoEvaluationBar = ({ fen, onBestLineFound }) => {
+  const engine = useMemo(() => new Engine(), []);
+  const [positionEvaluation, setPositionEvaluation] = useState(0);
   const evalValue = parseFloat(positionEvaluation);
   const [percentage, setPercentage] = useState(50);
-
   const animationRef = useRef(null);
   const targetPercentageRef = useRef(50);
+
+  function findBestMove(fenPosition) {
+    engine.stop();
+    engine.evaluatePosition(fenPosition, 16);
+    const chessGame = new Chess(fenPosition);
+    const toMakeMoveColor = chessGame.turn();
+    engine.onMessage(
+      ({ positionEvaluation, possibleMate, pv, depth, forcedWinColor }) => {
+        if (depth < 10) return;
+        positionEvaluation &&
+          setPositionEvaluation(
+            ((toMakeMoveColor === "w" ? 1 : -1) * Number(positionEvaluation)) /
+              100
+          );
+
+        if (forcedWinColor) {
+          setPositionEvaluation(forcedWinColor == "w" ? 40 : -40);
+        }
+
+        pv && onBestLineFound && onBestLineFound(pv);
+      }
+    );
+  }
+
+  useEffect(() => {
+    findBestMove(fen);
+  }, [fen]);
 
   useEffect(() => {
     if (evalValue > 40) {
       targetPercentageRef.current = 100;
-      console.log(`White Mate`);
     } else if (evalValue < -40) {
-      console.log(`Black Neg`);
       targetPercentageRef.current = 0;
     } else {
       targetPercentageRef.current = 50 + (evalValue / 4) * 20;
@@ -58,16 +86,7 @@ const EvaluationBar = ({ positionEvaluation, colorToPlay = "w" }) => {
 
   let barColor;
 
-  if (colorToPlay === "w" && positionEvaluation[0] === "#") {
-    // Make the bar totally white with flipped gradient
-    barColor = `linear-gradient(to bottom, black ${percentage}%, white ${percentage}%)`;
-  } else if (colorToPlay === "b") {
-    // Make the bar totally black with flipped gradient
-    barColor = `linear-gradient(to bottom, white ${percentage}%, black ${percentage}%)`;
-  } else {
-    // Default linear gradient
-    barColor = `linear-gradient(to bottom, white ${percentage}%, black ${percentage}%)`;
-  }
+  barColor = `linear-gradient(to bottom, white ${percentage}%, black ${percentage}%)`;
 
   const lineStyle = {
     position: "absolute",
@@ -75,7 +94,7 @@ const EvaluationBar = ({ positionEvaluation, colorToPlay = "w" }) => {
     left: 0,
     right: 0,
     height: "2px",
-    background: "red", // You can adjust the color
+    background: "red",
   };
 
   return (
@@ -98,4 +117,4 @@ const EvaluationBar = ({ positionEvaluation, colorToPlay = "w" }) => {
   );
 };
 
-export default EvaluationBar;
+export default AutoEvaluationBar;

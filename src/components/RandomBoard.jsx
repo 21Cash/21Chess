@@ -5,6 +5,7 @@ import moveSoundEffect from "../media/Move.mp3";
 import captureSoundEffect from "../media/Capture.mp3";
 import gameEndSoundEffect from "../media/GameEnd.mp3";
 import drawSoundEffect from "../media/Draw.mp3";
+import AutoEvaluationBar from "./AutoEvaluationBar";
 
 const boardWrapper = {
   width: `80vw`,
@@ -13,6 +14,7 @@ const boardWrapper = {
 };
 
 const MOVE_TIME_DELAY = 1000;
+const MAX_RANDOM_DELAY = 1000;
 
 const STARTING_POSITION_FEN =
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -32,7 +34,7 @@ const RandomBoard = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       makeRandomMove();
-    }, MOVE_TIME_DELAY);
+    }, MOVE_TIME_DELAY + Math.random() * MAX_RANDOM_DELAY);
 
     return () => {
       clearInterval(interval);
@@ -52,6 +54,8 @@ const RandomBoard = () => {
     // exit if the game is over
     if (game.game_over() || game.in_draw() || possibleMoves.length === 0) {
       console.log(`Game Over`);
+      console.log(`Game PGN`);
+      console.log(game.pgn());
       setTimeout(() => {
         console.log(`Starting New Game`);
         setGame(new Chess()); // Reset the game using setGame
@@ -115,23 +119,28 @@ const RandomBoard = () => {
   };
 
   return (
-    <div style={boardWrapper}>
-      <Chessboard
-        customSquareStyles={{
-          ...lastMoveSquares,
-          ...kingInCheckSquare,
-        }}
-        customDarkSquareStyle={{ backgroundColor: "#71818f" }}
-        customLightSquareStyle={{ backgroundColor: "#c8c7c8" }}
-        position={currentPosition}
-        customBoardStyle={{
-          borderRadius: "4px",
-          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-        }}
-        ref={chessboardRef}
-        allowDragOutsideBoard={false}
-        animationDuration={200}
-      />
+    <div className="flex items-center">
+      <div style={boardWrapper}>
+        <Chessboard
+          customSquareStyles={{
+            ...lastMoveSquares,
+            ...kingInCheckSquare,
+          }}
+          customDarkSquareStyle={{ backgroundColor: "#71818f" }}
+          customLightSquareStyle={{ backgroundColor: "#c8c7c8" }}
+          position={currentPosition}
+          customBoardStyle={{
+            borderRadius: "4px",
+            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+          }}
+          ref={chessboardRef}
+          allowDragOutsideBoard={false}
+          animationDuration={200}
+        />
+      </div>
+      {/* <div className="h-[80vh] ml-6">
+        <AutoEvaluationBar fen={currentPosition} />
+      </div> */}
     </div>
   );
 };
