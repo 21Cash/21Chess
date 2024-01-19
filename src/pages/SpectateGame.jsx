@@ -78,20 +78,43 @@ const SpectateGame = () => {
   const [bestLine, setBestline] = useState("");
   const [possibleMate, setPossibleMate] = useState("");
   const bestMove = bestLine?.split(" ")?.[0];
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      if (myColor === toMakeMoveColor) {
+        setMyTime((prevTime) => Math.max(prevTime - 1000, 0));
+      } else {
+        setOpponentTime((prevTime) => Math.max(prevTime - 1000, 0));
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalRef.current);
+    };
+  }, [toMakeMoveColor]);
 
   function findBestMove(fenPosition) {
     engine.evaluatePosition(fenPosition, 16);
 
-    engine.onMessage(({ positionEvaluation, possibleMate, pv, depth }) => {
-      if (depth < 10) return;
-      positionEvaluation &&
-        setPositionEvaluation(
-          ((game.turn() === "w" ? 1 : -1) * Number(positionEvaluation)) / 100
-        );
-      possibleMate && setPossibleMate(possibleMate);
-      depth && setDepth(depth);
-      pv && setBestline(pv);
-    });
+    engine.onMessage(
+      ({ positionEvaluation, possibleMate, pv, depth, forcedWinColor }) => {
+        if (depth < 10) return;
+        positionEvaluation &&
+          setPositionEvaluation(
+            ((toMakeMoveColor === "w" ? 1 : -1) * Number(positionEvaluation)) /
+              100
+          );
+
+        if (forcedWinColor) {
+          setPositionEvaluation(forcedWinColor == "w" ? 40 : -40);
+        }
+        possibleMate && setPossibleMate(possibleMate);
+        depth && setDepth(depth);
+        pv && setBestline(pv);
+      }
+    );
   }
 
   const handleMoveSound = async (moveObj) => {
@@ -106,7 +129,7 @@ const SpectateGame = () => {
     }
   };
 
-  const updateTimers = (whiteTimerInMs, blackTimeInMs) => {
+  const updateTimers = (whiteTimerInMs, blackTimeInMs, toMoveColor) => {
     if (myColor == "w") {
       setMyTime(whiteTimerInMs);
       setOpponentTime(blackTimeInMs);
@@ -114,14 +137,6 @@ const SpectateGame = () => {
       setMyTime(blackTimeInMs);
       setOpponentTime(whiteTimerInMs);
     }
-    clearInterval(interval);
-    interval = setInterval(() => {
-      if (myColor == toMakeMoveColor) {
-        setMyTime((prevTime) => Math.max(prevTime - 1000, 0));
-      } else {
-        setOpponentTime((prevTime) => Math.max(prevTime - 1000, 0));
-      }
-    }, 1000);
   };
 
   const updateKingInCheckSquare = () => {
@@ -177,7 +192,7 @@ const SpectateGame = () => {
 
       console.log(`Move received => ${moveObj.san}`);
       setToMakeMoveColor(color == "w" ? "b" : "w");
-      updateTimers(whiteTime, blackTime);
+      updateTimers(whiteTime, blackTime, moveObj.color == "w" ? "b" : "w");
 
       // Update game, so that we can know checks
       game.load(fen);
@@ -194,7 +209,7 @@ const SpectateGame = () => {
         engine.stop();
         findBestMove(fen);
       }
-      return () => clearInterval(interval);
+      return () => clearInterval(intervalRef.current);
     });
 
     socket.on("endGame", (resultData) => {
@@ -225,7 +240,7 @@ const SpectateGame = () => {
       } else {
         setResultText("Black is Victorious • 0-1");
       }
-      clearInterval(interval);
+      clearInterval(intervalRef.current);
     });
   }, []);
 

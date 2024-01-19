@@ -57,11 +57,27 @@ const Game = () => {
   const [showRematch, setShowRematch] = useState(false);
 
   const [myColor, setMyColor] = useState(gameContext.myColor);
+  const [toMakeMoveColor, setToMakeMoveColor] = useState("w");
   const [moveFromSquare, setMoveFromSquare] = useState("");
   const [resultText, setResultText] = useState("");
   let opponentUsername;
-  let interval;
 
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      if (myColor === toMakeMoveColor) {
+        setMyTime((prevTime) => Math.max(prevTime - 1000, 0));
+      } else {
+        setOpponentTime((prevTime) => Math.max(prevTime - 1000, 0));
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalRef.current);
+    };
+  }, [toMakeMoveColor]);
   const handleMoveSound = async (moveObj) => {
     const isCapture = moveObj.flags.includes("c");
     const isCheckmate = moveObj.san.includes("#");
@@ -82,14 +98,6 @@ const Game = () => {
       setMyTime(blackTimeInMs);
       setOpponentTime(whiteTimerInMs);
     }
-    clearInterval(interval);
-    interval = setInterval(() => {
-      if (myColor == game.turn()) {
-        setMyTime((prevTime) => Math.max(prevTime - 1000, 0));
-      } else {
-        setOpponentTime((prevTime) => Math.max(prevTime - 1000, 0));
-      }
-    }, 1000);
   };
 
   const updateKingInCheckSquare = () => {
@@ -163,7 +171,8 @@ const Game = () => {
         whiteTime,
         fen,
       } = data;
-      updateTimers(whiteTime, blackTime, moveObj.color);
+      setToMakeMoveColor(moveObj.color == "w" ? "b" : "w");
+      updateTimers(whiteTime, blackTime, moveObj.color == "w" ? "b" : "w");
       if (senderId == socket.id) return; // Ignore self Moves
 
       game.move(moveObj);
@@ -172,7 +181,7 @@ const Game = () => {
       handleMoveSound(moveObj);
       setLastMoveSquaresTo([moveObj.from, moveObj.to]);
       updateKingInCheckSquare();
-      return () => clearInterval(interval);
+      return () => clearInterval(intervalRef.current);
     });
     socket.on("startGame", (gameData) => {
       console.log("Start Game From Server.");
@@ -193,7 +202,6 @@ const Game = () => {
       } else opponentName = whiteName;
       console.log(`USERNAME : ${username}`);
       const newColor = username == whiteName ? "w" : "b";
-      console.log(`Setting New color To ${newColor}`);
       setMyColor(newColor);
       setGameContext({
         ...gameContext,
@@ -238,7 +246,7 @@ const Game = () => {
       } else {
         setResultText("Black is Victorious • 0-1");
       }
-      clearInterval(interval);
+      clearInterval(intervalRef.current);
       setShowRematch(true);
     });
 

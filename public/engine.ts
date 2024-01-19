@@ -24,6 +24,8 @@ type EngineMessage = {
   pv?: string;
   /** number of halfmoves the engine looks ahead */
   depth?: number;
+  /** Color of the side with the forced mate ('w' for white, 'b' for black, or null if no forced mate) */
+  forcedWinColor: null | "w" | "b";
 };
 
 export default class Engine {
@@ -42,17 +44,30 @@ export default class Engine {
     this.init();
   }
 
-  private transformSFMessageData(e) {
+  private transformSFMessageData(e): EngineMessage {
     const uciMessage = e?.data ?? e;
+
+    const positionEvaluation = uciMessage.match(/cp\s+(-?\d+)/)?.[1];
+    const possibleMate = uciMessage.match(/mate\s+(-?\d+)/)?.[1];
+
+    let forcedWinColor: null | "w" | "b" = null;
+    if (possibleMate !== undefined) {
+      if (possibleMate > 0) {
+        forcedWinColor = "w"; // White is winning
+      } else if (possibleMate < 0) {
+        forcedWinColor = "b"; // Black is winning
+      }
+    }
 
     return {
       uciMessage,
-      bestMove: uciMessage.match(/bestmove\s+(\S+)/)?.[1],
-      ponder: uciMessage.match(/ponder\s+(\S+)/)?.[1],
-      positionEvaluation: uciMessage.match(/cp\s+(\S+)/)?.[1],
-      possibleMate: uciMessage.match(/mate\s+(\S+)/)?.[1],
-      pv: uciMessage.match(/ pv\s+(.*)/)?.[1],
+      bestMove: uciMessage.match(/bestmove\s+(\S+)/)?.[1] ?? null,
+      ponder: uciMessage.match(/ponder\s+(\S+)/)?.[1] ?? null,
+      positionEvaluation: positionEvaluation ?? null,
+      possibleMate: possibleMate ?? null,
+      pv: uciMessage.match(/ pv\s+(.*)/)?.[1] ?? null,
       depth: Number(uciMessage.match(/ depth\s+(\S+)/)?.[1]) ?? 0,
+      forcedWinColor,
     };
   }
 
