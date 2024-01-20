@@ -3,6 +3,7 @@ import { backendUrl } from "../../Constants";
 import { SocketContext } from "../Context";
 import { UserContext } from "../Context";
 import { useNavigate } from "react-router-dom";
+import MainFooter from "../components/MainFooter";
 
 const EnterPage = () => {
   const [serverStatus, setServerStatus] = useState("Checking status");
@@ -115,21 +116,7 @@ const EnterPage = () => {
           </div>
         )}
       </div>
-
-      <footer className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-center py-4">
-        <p className="text-gray-400">
-          &#169; {new Date().getFullYear()} 21Chess. Made with &#10084;&#65039;
-          by 21Cash.{" "}
-          <a
-            href="https://github.com/21Cash/21Chess"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline"
-          >
-            View Source Code
-          </a>
-        </p>
-      </footer>
+      <MainFooter />
     </div>
   );
 };

@@ -11,6 +11,7 @@ const AutoEvaluationBar = ({
 }) => {
   const engine = useMemo(() => new Engine(), []);
   const [positionEvaluation, setPositionEvaluation] = useState(0);
+  const [mateText, setMateText] = useState(null);
   const evalValue = parseFloat(positionEvaluation);
   const [percentage, setPercentage] = useState(50);
   const animationRef = useRef(null);
@@ -18,6 +19,7 @@ const AutoEvaluationBar = ({
 
   function findBestMove(fenPosition) {
     engine.stop();
+    setMateText(null);
     engine.evaluatePosition(fenPosition, engineDepth);
     const chessGame = new Chess(fenPosition);
     const toMakeMoveColor = chessGame.turn();
@@ -37,14 +39,15 @@ const AutoEvaluationBar = ({
           );
 
         if (forcedMateEvaluation) {
-          const playerToMoveIsLosing = forcedMateEvaluation == -1;
+          console.log(forcedMateEvaluation);
+          const playerToMoveIsLosing = forcedMateEvaluation < 0;
           let winningColor = toMakeMoveColor;
           if (playerToMoveIsLosing)
             winningColor = toMakeMoveColor == "w" ? "b" : "w";
-
           const curEval = winningColor == "w" ? 40 : -40;
-
           setPositionEvaluation(curEval);
+          const text = `#${Math.abs(forcedMateEvaluation)}`;
+          setMateText(text);
         }
 
         pv && onBestLineFound && onBestLineFound(pv);
@@ -122,9 +125,7 @@ const AutoEvaluationBar = ({
     <div className="flex h-full w-2 flex-col items-center relative">
       {showEvaluationText && (
         <div className="text-xs text-green-500 font-bold ">
-          {positionEvaluation >= 40 || positionEvaluation <= -40
-            ? "∞"
-            : positionEvaluation}
+          {mateText != null ? mateText : positionEvaluation}
         </div>
       )}
       <div
