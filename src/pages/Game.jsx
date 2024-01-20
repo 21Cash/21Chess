@@ -377,7 +377,7 @@ const Game = () => {
       </div>
 
       {/* Middle div for chessboard */}
-      <div className="flex-3 h-full flex justify-center  mx-10">
+      <div className="flex-3 h-full flex justify-center my-auto mx-10">
         <div style={boardWrapper}>
           <Chessboard
             customDarkSquareStyle={{ backgroundColor: "#71818f" }}
