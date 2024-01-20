@@ -226,17 +226,6 @@ const SpectateGame = () => {
     <div className="h-auto flex flex-col sm:flex-row bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
       <div className="h-[85vh] w-[90vw] sm:w-1/4 order-last sm:order-first mt-10 mb-14 mx-5 flex-1 bg-gray-700 p-4">
         <ChatBox roomName={curGameString} />
-        {/* <div>
-          <h4>
-            Position Evaluation:{" "}
-            {possibleMate ? `#${possibleMate}` : positionEvaluation}
-            {"; "}
-            Depth: {depth}
-          </h4>
-          <h5>
-            Best line: <i>{bestLine.slice(0, 40)}</i> ...
-          </h5>
-        </div> */}
       </div>
 
       <div className="flex-3 sm:ml-8 flex justify-center">

@@ -129,7 +129,7 @@ function App() {
                 challengerName={challengeData.senderName}
                 format={`${challengeData.totalTimeInSecs / 60} + ${
                   challengeData.incrementTimeInSecs
-                }`}
+                } ${challengeData.evalGame ? " (With Evaluation) " : ""}`}
                 onAccept={handleRequestOnAccept}
                 onDecline={handleRequestDecline}
               />

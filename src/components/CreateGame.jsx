@@ -38,11 +38,13 @@ const CreateGame = () => {
 
     const timeData = getTimeData(timeControl);
     const gameData = {
-      showEval: showEval,
+      evalGame: showEval,
       totalTime: timeData.totalTime,
       timeIncrement: timeData.timeIncrement,
       targetOpponent: targetOpponent,
     };
+    console.log(`Making Create Game Req with Data`);
+    console.log(gameData);
     socket.emit("createGame", gameData);
 
     socket.on("gameCreated", (gameInfo) => {
@@ -101,7 +103,8 @@ const CreateGame = () => {
             className="h-4 w-4 mr-2 rounded bg-gray-500"
           />
           <label htmlFor="showEval" className="text-gray-300">
-            Show Evaluation
+            Show Evaluation{" "}
+            <span className="text-xs text-blue-400">(Experimental)</span>
           </label>
         </div>
 

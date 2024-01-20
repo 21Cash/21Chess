@@ -8,6 +8,7 @@ import captureSoundEffect from "../media/Capture.mp3";
 import gameEndSoundEffect from "../media/GameEnd.mp3";
 import drawSoundEffect from "../media/Draw.mp3";
 import ChatBox from "../components/ChatBox";
+import AutoEvaluationBar from "../components/AutoEvaluationBar";
 
 const buttonStyle = {
   cursor: "pointer",
@@ -55,11 +56,11 @@ const Game = () => {
   const [kingInCheckSquare, setKingInCheckSquare] = useState(null);
   const [possibleMovesSquares, setPossibleMoveSquares] = useState(null);
   const [showRematch, setShowRematch] = useState(false);
-
-  const [myColor, setMyColor] = useState(gameContext.myColor);
+  const [myColor, setMyColor] = useState("w");
   const [toMakeMoveColor, setToMakeMoveColor] = useState("w");
   const [moveFromSquare, setMoveFromSquare] = useState("");
   const [resultText, setResultText] = useState("");
+  const [evalGame, setEvalGame] = useState(false);
   let opponentUsername;
 
   const intervalRef = useRef(null);
@@ -87,16 +88,6 @@ const Game = () => {
       captureSound.play();
     } else {
       moveSound.play();
-    }
-  };
-
-  const updateTimers = (whiteTimerInMs, blackTimeInMs, moveColor) => {
-    if (myColor == "w") {
-      setMyTime(whiteTimerInMs);
-      setOpponentTime(blackTimeInMs);
-    } else {
-      setMyTime(blackTimeInMs);
-      setOpponentTime(whiteTimerInMs);
     }
   };
 
@@ -170,9 +161,26 @@ const Game = () => {
         blackTime,
         whiteTime,
         fen,
+        whiteName,
+        blackName,
       } = data;
+
       setToMakeMoveColor(moveObj.color == "w" ? "b" : "w");
-      updateTimers(whiteTime, blackTime, moveObj.color == "w" ? "b" : "w");
+
+      // TODO : Fix the Timer BUG
+      const localColor = username == whiteName ? "w" : "b"; // Its myColor basically, this is a bug hot fix ,
+
+      // Updating Timers
+      if (localColor == "w") {
+        setMyTime(whiteTime);
+        setOpponentTime(blackTime);
+      } else {
+        setMyTime(blackTime);
+        setOpponentTime(whiteTime);
+      }
+
+      setMyColor(localColor);
+
       if (senderId == socket.id) return; // Ignore self Moves
 
       game.move(moveObj);
@@ -191,11 +199,12 @@ const Game = () => {
         totalTimeInSecs,
         incrementTimeInSecs,
         gameString,
+        evalGame,
       } = gameData;
 
       console.log(gameData);
       setResultText("");
-
+      setEvalGame(evalGame);
       let opponentName;
       if (username == whiteName) {
         opponentName = blackName;
@@ -209,6 +218,7 @@ const Game = () => {
         totalTimeInSecs,
         incrementTimeInSecs,
         gameString,
+        myColor: newColor,
       });
       setGameHasStarted(true);
       console.log(`Opponent : ${opponentName}`);
@@ -350,7 +360,7 @@ const Game = () => {
       return;
     }
 
-    if (possibleMovesSquares.hasOwnProperty(square)) {
+    if (possibleMovesSquares && possibleMovesSquares.hasOwnProperty(square)) {
       makeMove(moveFromSquare, square);
     }
   };
@@ -367,8 +377,8 @@ const Game = () => {
       </div>
 
       {/* Middle div for chessboard */}
-      <div className="flex-3 flex justify-center mx-10">
-        <div className="pt-5" style={boardWrapper}>
+      <div className="flex-3 h-full flex justify-center  mx-10">
+        <div style={boardWrapper}>
           <Chessboard
             customDarkSquareStyle={{ backgroundColor: "#71818f" }}
             customLightSquareStyle={{ backgroundColor: "#c8c7c8" }}
@@ -401,6 +411,15 @@ const Game = () => {
             animationDuration={200}
           />
         </div>
+        {evalGame && (
+          <div className="h-[35vh] md:h-[80vh] my-auto ml-4 md:ml-8">
+            <AutoEvaluationBar
+              fen={currentPosition}
+              showEvaluationText={false}
+              whiteAtBottom={myColor == "w"}
+            />
+          </div>
+        )}
       </div>
       <div className="h-3/5 self-center my-6 mx-4 flex-1  bg-gray-500 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
         <div className="text-lg font-semibold text-gray-700 mb-4">

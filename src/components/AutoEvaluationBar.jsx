@@ -2,7 +2,13 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import Engine from "../../public/engine";
 import { Chess } from "chess.js";
 
-const AutoEvaluationBar = ({ fen, onBestLineFound }) => {
+const AutoEvaluationBar = ({
+  fen,
+  showEvaluationText = true,
+  whiteAtBottom = true,
+  engineDepth = 18,
+  onBestLineFound,
+}) => {
   const engine = useMemo(() => new Engine(), []);
   const [positionEvaluation, setPositionEvaluation] = useState(0);
   const evalValue = parseFloat(positionEvaluation);
@@ -12,20 +18,33 @@ const AutoEvaluationBar = ({ fen, onBestLineFound }) => {
 
   function findBestMove(fenPosition) {
     engine.stop();
-    engine.evaluatePosition(fenPosition, 16);
+    engine.evaluatePosition(fenPosition, engineDepth);
     const chessGame = new Chess(fenPosition);
     const toMakeMoveColor = chessGame.turn();
     engine.onMessage(
-      ({ positionEvaluation, possibleMate, pv, depth, forcedWinColor }) => {
-        if (depth < 10) return;
+      ({
+        positionEvaluation,
+        possibleMate,
+        pv,
+        depth,
+        forcedMateEvaluation,
+      }) => {
+        if (depth < 6) return;
         positionEvaluation &&
           setPositionEvaluation(
             ((toMakeMoveColor === "w" ? 1 : -1) * Number(positionEvaluation)) /
               100
           );
 
-        if (forcedWinColor) {
-          setPositionEvaluation(forcedWinColor == "w" ? 40 : -40);
+        if (forcedMateEvaluation) {
+          const playerToMoveIsLosing = forcedMateEvaluation == -1;
+          let winningColor = toMakeMoveColor;
+          if (playerToMoveIsLosing)
+            winningColor = toMakeMoveColor == "w" ? "b" : "w";
+
+          const curEval = winningColor == "w" ? 40 : -40;
+
+          setPositionEvaluation(curEval);
         }
 
         pv && onBestLineFound && onBestLineFound(pv);
@@ -43,7 +62,7 @@ const AutoEvaluationBar = ({ fen, onBestLineFound }) => {
     } else if (evalValue < -40) {
       targetPercentageRef.current = 0;
     } else {
-      targetPercentageRef.current = 50 + (evalValue / 4) * 20;
+      targetPercentageRef.current = 50 + (evalValue / 3) * 20;
     }
   }, [evalValue]);
 
@@ -97,17 +116,21 @@ const AutoEvaluationBar = ({ fen, onBestLineFound }) => {
     background: "red",
   };
 
+  const barRotationStyle = whiteAtBottom ? "rotate(180deg)" : "";
+
   return (
     <div className="flex h-full w-2 flex-col items-center relative">
-      <div className="text-xs text-green-500 font-bold ">
-        {positionEvaluation >= 40 || positionEvaluation <= -40
-          ? "∞"
-          : positionEvaluation}
-      </div>
+      {showEvaluationText && (
+        <div className="text-xs text-green-500 font-bold ">
+          {positionEvaluation >= 40 || positionEvaluation <= -40
+            ? "∞"
+            : positionEvaluation}
+        </div>
+      )}
       <div
         style={{
           background: barColor,
-          transform: "rotate(180deg)",
+          transform: barRotationStyle,
         }}
         className="h-full w-4 border rounded-md overflow-hidden relative"
       >

@@ -25,7 +25,7 @@ type EngineMessage = {
   /** number of halfmoves the engine looks ahead */
   depth?: number;
   /** Color of the side with the forced mate ('w' for white, 'b' for black, or null if no forced mate) */
-  forcedWinColor: null | "w" | "b";
+  forcedMateEvaluation: number | null;
 };
 
 export default class Engine {
@@ -50,14 +50,10 @@ export default class Engine {
     const positionEvaluation = uciMessage.match(/cp\s+(-?\d+)/)?.[1];
     const possibleMate = uciMessage.match(/mate\s+(-?\d+)/)?.[1];
 
-    let forcedWinColor: null | "w" | "b" = null;
-    if (possibleMate !== undefined) {
-      if (possibleMate > 0) {
-        forcedWinColor = "w"; // White is winning
-      } else if (possibleMate < 0) {
-        forcedWinColor = "b"; // Black is winning
-      }
-    }
+    const forcedMateEvaluation = (uciMessage.match(/score mate (-?\d+)/) ||
+      [])[1]
+      ? parseInt((uciMessage.match(/score mate (-?\d+)/) || [])[1], 10)
+      : null;
 
     return {
       uciMessage,
@@ -67,7 +63,7 @@ export default class Engine {
       possibleMate: possibleMate ?? null,
       pv: uciMessage.match(/ pv\s+(.*)/)?.[1] ?? null,
       depth: Number(uciMessage.match(/ depth\s+(\S+)/)?.[1]) ?? 0,
-      forcedWinColor,
+      forcedMateEvaluation,
     };
   }
 
