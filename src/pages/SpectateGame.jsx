@@ -9,6 +9,12 @@ import captureSoundEffect from "../media/Capture.mp3";
 import gameEndSoundEffect from "../media/GameEnd.mp3";
 import drawSoundEffect from "../media/Draw.mp3";
 import AutoEvaluationBar from "../components/AutoEvaluationBar";
+import {
+  darkSquareStyle,
+  kingCheckStyles,
+  lastMoveStyles,
+  lightSquareStyle,
+} from "../constants";
 
 const buttonStyle = {
   cursor: "pointer",
@@ -133,11 +139,7 @@ const SpectateGame = () => {
         }
       }
       setKingInCheckSquare({
-        [kingSquare]: {
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle at center, #FF0000, #FFDAB9 100%)",
-        },
+        [kingSquare]: kingCheckStyles,
       });
     } else {
       setKingInCheckSquare(null);
@@ -217,7 +219,7 @@ const SpectateGame = () => {
 
   const setLastMoveSquaresTo = (squares) => {
     const hightlightSquares = Object.fromEntries(
-      squares.map((item) => [item, { background: "rgba(144, 238, 144, 0.90)" }])
+      squares.map((item) => [item, lastMoveStyles])
     );
     // update last moves State
     setLastMoveSquares(hightlightSquares);
@@ -240,8 +242,8 @@ const SpectateGame = () => {
                 ],
               ]
             }
-            customDarkSquareStyle={{ backgroundColor: "#71818f" }}
-            customLightSquareStyle={{ backgroundColor: "#c8c7c8" }}
+            customDarkSquareStyle={darkSquareStyle}
+            customLightSquareStyle={lightSquareStyle}
             customSquareStyles={{
               ...lastMoveSquares,
               ...kingInCheckSquare,

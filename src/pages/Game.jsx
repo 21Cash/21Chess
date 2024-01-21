@@ -9,7 +9,14 @@ import gameEndSoundEffect from "../media/GameEnd.mp3";
 import drawSoundEffect from "../media/Draw.mp3";
 import ChatBox from "../components/ChatBox";
 import AutoEvaluationBar from "../components/AutoEvaluationBar";
-
+import {
+  lastMoveStyles,
+  customPremoveDarkSquareStyle,
+  customPremoveLightSquareStyle,
+  darkSquareStyle,
+  lightSquareStyle,
+  kingCheckStyles,
+} from "../constants";
 const buttonStyle = {
   cursor: "pointer",
   padding: "10px 20px",
@@ -110,11 +117,7 @@ const Game = () => {
         }
       }
       setKingInCheckSquare({
-        [kingSquare]: {
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle at center, #FF0000, #FFDAB9 100%)",
-        },
+        [kingSquare]: kingCheckStyles,
       });
     } else {
       setKingInCheckSquare(null);
@@ -283,7 +286,7 @@ const Game = () => {
 
   const setLastMoveSquaresTo = (squares) => {
     const hightlightSquares = Object.fromEntries(
-      squares.map((item) => [item, { background: "rgba(144, 238, 144, 0.90)" }])
+      squares.map((item) => [item, lastMoveStyles])
     );
     // update last moves State
     setLastMoveSquares(hightlightSquares);
@@ -380,14 +383,10 @@ const Game = () => {
       <div className="flex-3 h-full flex justify-center my-auto mx-10">
         <div style={boardWrapper}>
           <Chessboard
-            customDarkSquareStyle={{ backgroundColor: "#71818f" }}
-            customLightSquareStyle={{ backgroundColor: "#c8c7c8" }}
-            customPremoveDarkSquareStyle={{
-              backgroundColor: "rgb(239, 68, 68)",
-            }}
-            customPremoveLightSquareStyle={{
-              backgroundColor: "rgb(239, 68, 68)",
-            }}
+            customDarkSquareStyle={darkSquareStyle}
+            customLightSquareStyle={lightSquareStyle}
+            customPremoveDarkSquareStyle={customPremoveDarkSquareStyle}
+            customPremoveLightSquareStyle={customPremoveLightSquareStyle}
             customSquareStyles={{
               ...lastMoveSquares,
               ...kingInCheckSquare,

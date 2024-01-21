@@ -6,7 +6,12 @@ import captureSoundEffect from "../media/Capture.mp3";
 import gameEndSoundEffect from "../media/GameEnd.mp3";
 import drawSoundEffect from "../media/Draw.mp3";
 import AutoEvaluationBar from "./AutoEvaluationBar";
-
+import {
+  darkSquareStyle,
+  kingCheckStyles,
+  lastMoveStyles,
+  lightSquareStyle,
+} from "../constants";
 const boardWrapper = {
   width: `80vw`,
   maxWidth: "80vh",
@@ -99,11 +104,7 @@ const RandomBoard = () => {
         }
       }
       setKingInCheckSquare({
-        [kingSquare]: {
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle at center, #FF0000, #FFDAB9 100%)",
-        },
+        [kingSquare]: kingCheckStyles,
       });
     } else {
       setKingInCheckSquare(null);
@@ -112,7 +113,7 @@ const RandomBoard = () => {
 
   const setLastMoveSquaresTo = (squares) => {
     const highlightSquares = Object.fromEntries(
-      squares.map((item) => [item, { background: "rgba(144, 238, 144, 0.90)" }])
+      squares.map((item) => [item, lastMoveStyles])
     );
     // update last moves State
     setLastMoveSquares(highlightSquares);
@@ -126,8 +127,8 @@ const RandomBoard = () => {
             ...lastMoveSquares,
             ...kingInCheckSquare,
           }}
-          customDarkSquareStyle={{ backgroundColor: "#71818f" }}
-          customLightSquareStyle={{ backgroundColor: "#c8c7c8" }}
+          customDarkSquareStyle={darkSquareStyle}
+          customLightSquareStyle={lightSquareStyle}
           position={currentPosition}
           customBoardStyle={{
             borderRadius: "4px",
