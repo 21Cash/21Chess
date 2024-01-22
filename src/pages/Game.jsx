@@ -142,6 +142,7 @@ const Game = () => {
     handleMoveSound(res);
     setLastMoveSquaresTo([res.from, res.to]);
     setPossibleMoveSquares([]);
+    setMoveFromSquare(null);
     updateKingInCheckSquare();
   };
 
@@ -358,6 +359,12 @@ const Game = () => {
   };
 
   const onSquareClick = (square) => {
+    if (moveFromSquare && moveFromSquare == square) {
+      setMoveFromSquare(null);
+      setPossibleMoveSquares([]);
+      return;
+    }
+
     if (game.get(square) != null && game.get(square).color == myColor) {
       getMoveOptions(square);
       return;
@@ -370,6 +377,7 @@ const Game = () => {
 
   const onSquareRightClick = (square) => {
     setPossibleMoveSquares([]);
+    setMoveFromSquare(null);
   };
 
   return (
