@@ -31,7 +31,7 @@ const AutoEvaluationBar = ({
         depth,
         forcedMateEvaluation,
       }) => {
-        if (depth < 6) return;
+        if (depth < 8) return;
         positionEvaluation &&
           setPositionEvaluation(
             ((toMakeMoveColor === "w" ? 1 : -1) * Number(positionEvaluation)) /
@@ -67,10 +67,16 @@ const AutoEvaluationBar = ({
     } else {
       targetPercentageRef.current = 50 + (evalValue / 3) * 20;
     }
+    if (!mateText && targetPercentageRef.current > 95) {
+      targetPercentageRef.current = 95;
+    }
+    if (!mateText && targetPercentageRef.current < 5) {
+      targetPercentageRef.current = 5;
+    }
   }, [evalValue]);
 
   useEffect(() => {
-    const animationDuration = 500; // 500 milliseconds
+    const animationDuration = 600; // 500 milliseconds
     const framesPerSecond = 60; // Number of frames per second
     const totalFrames = framesPerSecond * (animationDuration / 1000); // Total frames for 500 milliseconds
 
