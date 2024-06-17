@@ -8,8 +8,8 @@ const About = () => {
         <div className="text-center">
           <h1 className="text-5xl font-bold mb-10">21Chess</h1>
           <p className="mb-10 text-lg">
-            21Chess is an Open-source free online chess platform that aims to
-            provide a minimalistic and fun experience.
+            21Chess is an online chess platform that aims to provide a
+            minimalistic and fun experience.
           </p>
 
           <div className="mt-8">

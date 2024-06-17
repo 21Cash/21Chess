@@ -6,7 +6,7 @@ const MainFooter = () => {
       <footer className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-center py-4">
         <p className="text-gray-400">
           &#169; {new Date().getFullYear()} 21Chess. Made with{" "}
-          <span className="opacity-70"> 🤍</span> by 21Cash.{" "}
+          <span className="opacity-70"> 🤍</span> by Sushil L.{" "}
           <a
             href="https://github.com/21Cash/21Chess"
             target="_blank"

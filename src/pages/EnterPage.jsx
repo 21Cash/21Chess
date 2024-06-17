@@ -68,10 +68,10 @@ const EnterPage = () => {
   };
 
   return (
-    <div>
-      <div className="bg-gray-900 to-gray-900 text-white flex items-center justify-center h-[85vh] mt-6">
+    <div className="h-full">
+      <div className="bg-gray-900 to-gray-900 text-white flex items-center justify-center h-full mt-6">
         {loading ? (
-          <div className="flex items-center justify-center h-screen">
+          <div className="flex items-center justify-center h-full">
             <p className="text-4xl">Loading...</p>
             <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white ml-3"></div>
           </div>
