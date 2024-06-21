@@ -68,8 +68,8 @@ const EnterPage = () => {
   };
 
   return (
-    <div className="h-full">
-      <div className="bg-gray-900 to-gray-900 text-white flex items-center justify-center h-full mt-6">
+    <div className="">
+      <div className="bg-gray-900 to-gray-900 text-white flex items-center justify-center mt-6 h-[calc(100vh-7rem)]">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-4xl">Loading...</p>

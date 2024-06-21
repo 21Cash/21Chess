@@ -9,6 +9,8 @@ import gameEndSoundEffect from "../media/GameEnd.mp3";
 import drawSoundEffect from "../media/Draw.mp3";
 import ChatBox from "../components/ChatBox";
 import AutoEvaluationBar from "../components/AutoEvaluationBar";
+import MainFooter from "../components/MainFooter";
+
 import {
   lastMoveStyles,
   customPremoveDarkSquareStyle,
@@ -381,98 +383,105 @@ const Game = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
-      <div className="h-[85vh] w-[90vw] sm:w-1/4 order-last  sm:order-first mt-10 mb-14 mx-5 flex-1 bg-gray-700 p-4">
-        {/*Chat Room */}
-        <ChatBox roomName={gameContext.gameString} />
-      </div>
-
-      {/* Middle div for chessboard */}
-      <div className="flex-3 h-full flex justify-center my-auto mx-10">
-        <div style={boardWrapper}>
-          <Chessboard
-            customDarkSquareStyle={darkSquareStyle}
-            customLightSquareStyle={lightSquareStyle}
-            customPremoveDarkSquareStyle={customPremoveDarkSquareStyle}
-            customPremoveLightSquareStyle={customPremoveLightSquareStyle}
-            customSquareStyles={{
-              ...lastMoveSquares,
-              ...kingInCheckSquare,
-              ...possibleMovesSquares,
-            }}
-            id="PremovesEnabled"
-            onPieceDragBegin={onPieceDragBegin}
-            onSquareClick={onSquareClick}
-            onSquareRightClick={onSquareRightClick}
-            arePremovesAllowed={true}
-            position={currentPosition}
-            isDraggablePiece={({ piece }) => piece[0] === myColor[0]}
-            onPieceDrop={onDrop}
-            customBoardStyle={{
-              borderRadius: "4px",
-              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-            }}
-            ref={chessboardRef}
-            boardOrientation={myColor == "w" ? "white" : "black"}
-            animationDuration={200}
-          />
+    <div>
+      <div className="flex flex-col md:flex-row bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
+        <div className="h-[85vh] w-[90vw] sm:w-1/4 order-last  sm:order-first mt-10 mb-14 mx-5 flex-1 bg-gray-700 p-4">
+          {/*Chat Room */}
+          <ChatBox roomName={gameContext.gameString} />
         </div>
-        {evalGame && (
-          <div className="h-[35vh] md:h-[80vh] my-auto ml-4 md:ml-8">
-            <AutoEvaluationBar
-              fen={currentPosition}
-              showEvaluationText={false}
-              whiteAtBottom={myColor == "w"}
+
+        {/* Middle div for chessboard */}
+        <div className="flex-3 h-full flex justify-center my-auto mx-10">
+          <div style={boardWrapper}>
+            <Chessboard
+              customDarkSquareStyle={darkSquareStyle}
+              customLightSquareStyle={lightSquareStyle}
+              customPremoveDarkSquareStyle={customPremoveDarkSquareStyle}
+              customPremoveLightSquareStyle={customPremoveLightSquareStyle}
+              customSquareStyles={{
+                ...lastMoveSquares,
+                ...kingInCheckSquare,
+                ...possibleMovesSquares,
+              }}
+              id="PremovesEnabled"
+              onPieceDragBegin={onPieceDragBegin}
+              onSquareClick={onSquareClick}
+              onSquareRightClick={onSquareRightClick}
+              arePremovesAllowed={true}
+              position={currentPosition}
+              isDraggablePiece={({ piece }) => piece[0] === myColor[0]}
+              onPieceDrop={onDrop}
+              customBoardStyle={{
+                borderRadius: "4px",
+                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+              }}
+              ref={chessboardRef}
+              boardOrientation={myColor == "w" ? "white" : "black"}
+              animationDuration={200}
             />
           </div>
-        )}
-      </div>
-      <div className="h-3/5 self-center my-6 mx-4 flex-1  bg-gray-500 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
-        <div className="text-lg font-semibold text-gray-700 mb-4">
-          <div className="text-black text-4xl bg-gray-600 p-4 rounded-md pt-4 font-bold">
-            {!gameHasStarted ? `?? : ??` : getTimeFormattedString(opponentTime)}
-          </div>
+          {evalGame && (
+            <div className="h-[35vh] md:h-[80vh] my-auto ml-4 md:ml-8">
+              <AutoEvaluationBar
+                fen={currentPosition}
+                showEvaluationText={false}
+                whiteAtBottom={myColor == "w"}
+              />
+            </div>
+          )}
+        </div>
+        <div className="h-3/5 self-center my-6 mx-4 flex-1  bg-gray-500 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
+          <div className="text-lg font-semibold text-gray-700 mb-4">
+            <div className="text-black text-4xl bg-gray-600 p-4 rounded-md pt-4 font-bold">
+              {!gameHasStarted
+                ? `?? : ??`
+                : getTimeFormattedString(opponentTime)}
+            </div>
 
-          <div className="text-gray-900 text-3xl mb-2 font-thin mt-4">
-            {gameContext.opponent !== "" ? gameContext.opponent : "Waiting..."}
-          </div>
+            <div className="text-gray-900 text-3xl mb-2 font-thin mt-4">
+              {gameContext.opponent !== ""
+                ? gameContext.opponent
+                : "Waiting..."}
+            </div>
 
-          <div className="text-base mb-2">vs</div>
+            <div className="text-base mb-2">vs</div>
 
-          <div className="text-gray-900 text-3xl mb-4 font-thin">
-            {username}
-          </div>
+            <div className="text-gray-900 text-3xl mb-4 font-thin">
+              {username}
+            </div>
 
-          <div className="text-lg font-semibold text-gray-700 mt-auto">
-            <div className="text-black text-4xl bg-gray-600 p-4 rounded-md font-bold">
-              {!gameHasStarted ? "?? : ??" : getTimeFormattedString(myTime)}
+            <div className="text-lg font-semibold text-gray-700 mt-auto">
+              <div className="text-black text-4xl bg-gray-600 p-4 rounded-md font-bold">
+                {!gameHasStarted ? "?? : ??" : getTimeFormattedString(myTime)}
+              </div>
             </div>
           </div>
-        </div>
-        {resultText && (
-          <div className="bg-gray-800 py-2 px-6 my-3 rounded-md text-white ">
-            {resultText}
+          {resultText && (
+            <div className="bg-gray-800 py-2 px-6 my-3 rounded-md text-white ">
+              {resultText}
+            </div>
+          )}
+          <div className="flex gap-2">
+            {!showRematch && (
+              <button
+                onClick={onClickResign}
+                className="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50"
+              >
+                Resign
+              </button>
+            )}
+            {showRematch && (
+              <button
+                onClick={onClickRematch}
+                className="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
+              >
+                Rematch
+              </button>
+            )}
           </div>
-        )}
-        <div className="flex gap-2">
-          {!showRematch && (
-            <button
-              onClick={onClickResign}
-              className="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50"
-            >
-              Resign
-            </button>
-          )}
-          {showRematch && (
-            <button
-              onClick={onClickRematch}
-              className="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
-            >
-              Rematch
-            </button>
-          )}
         </div>
       </div>
+      <MainFooter />
     </div>
   );
 };

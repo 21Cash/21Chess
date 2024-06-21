@@ -9,6 +9,8 @@ import captureSoundEffect from "../media/Capture.mp3";
 import gameEndSoundEffect from "../media/GameEnd.mp3";
 import drawSoundEffect from "../media/Draw.mp3";
 import AutoEvaluationBar from "../components/AutoEvaluationBar";
+import MainFooter from "../components/MainFooter";
+
 import {
   darkSquareStyle,
   kingCheckStyles,
@@ -225,76 +227,79 @@ const SpectateGame = () => {
     setLastMoveSquares(hightlightSquares);
   };
   return (
-    <div className="h-auto flex flex-col sm:flex-row bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
-      <div className="h-[85vh] w-[90vw] sm:w-1/4 order-last sm:order-first mt-10 mb-14 mx-5 flex-1 bg-gray-700 p-4">
-        <ChatBox roomName={curGameString} />
-      </div>
-
-      <div className="flex-3 sm:ml-8 flex justify-center">
-        <div style={boardWrapper}>
-          <Chessboard
-            customArrows={
-              bestMove && [
-                [
-                  bestMove.substring(0, 2),
-                  bestMove.substring(2, 4),
-                  "rgb(0, 128, 0)",
-                ],
-              ]
-            }
-            customDarkSquareStyle={darkSquareStyle}
-            customLightSquareStyle={lightSquareStyle}
-            customSquareStyles={{
-              ...lastMoveSquares,
-              ...kingInCheckSquare,
-            }}
-            position={currentPosition}
-            customBoardStyle={{
-              borderRadius: "4px",
-              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-            }}
-            ref={chessboardRef}
-            allowDragOutsideBoard={false}
-            boardOrientation={myColor === "w" ? "white" : "black"}
-            animationDuration={200}
-          />
+    <div>
+      <div className="h-auto flex flex-col sm:flex-row bg-gradient-to-r from-gray-800 via-gray-900 to-gray-900">
+        <div className="h-[85vh] w-[90vw] sm:w-1/4 order-last sm:order-first mt-10 mb-14 mx-5 flex-1 bg-gray-700 p-4">
+          <ChatBox roomName={curGameString} />
         </div>
-        <div className="my-12 mr-3 ml-8 flex-1 ">
-          <AutoEvaluationBar
-            fen={currentPosition}
-            onBestLineFound={setBestline}
-          />
+
+        <div className="flex-3 sm:ml-8 flex justify-center">
+          <div style={boardWrapper}>
+            <Chessboard
+              customArrows={
+                bestMove && [
+                  [
+                    bestMove.substring(0, 2),
+                    bestMove.substring(2, 4),
+                    "rgb(0, 128, 0)",
+                  ],
+                ]
+              }
+              customDarkSquareStyle={darkSquareStyle}
+              customLightSquareStyle={lightSquareStyle}
+              customSquareStyles={{
+                ...lastMoveSquares,
+                ...kingInCheckSquare,
+              }}
+              position={currentPosition}
+              customBoardStyle={{
+                borderRadius: "4px",
+                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+              }}
+              ref={chessboardRef}
+              allowDragOutsideBoard={false}
+              boardOrientation={myColor === "w" ? "white" : "black"}
+              animationDuration={200}
+            />
+          </div>
+          <div className="my-12 mr-3 ml-8 flex-1 ">
+            <AutoEvaluationBar
+              fen={currentPosition}
+              onBestLineFound={setBestline}
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="h-3/5 self-center my-6 mx-4 flex-1  bg-gray-500 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
-        <div className="text-lg font-semibold text-gray-700 mb-4">
-          <div className="text-black text-4xl bg-gray-600 p-4 rounded-md pt-4 font-bold">
-            {getTimeFormattedString(opponentTime)}
-          </div>
-
-          <div className="text-gray-900 text-3xl mb-2 font-thin mt-4">
-            {blackName}
-          </div>
-
-          <div className="text-base mb-2">vs</div>
-
-          <div className="text-gray-900 text-3xl mb-4 font-thin">
-            {whiteName}
-          </div>
-
-          <div className="text-lg font-semibold text-gray-700 mt-auto">
-            <div className="text-black text-4xl bg-gray-600 p-4 rounded-md font-bold">
-              {getTimeFormattedString(myTime)}
+        <div className="h-3/5 self-center my-6 mx-4 flex-1  bg-gray-500 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
+          <div className="text-lg font-semibold text-gray-700 mb-4">
+            <div className="text-black text-4xl bg-gray-600 p-4 rounded-md pt-4 font-bold">
+              {getTimeFormattedString(opponentTime)}
             </div>
-            {resultText && (
-              <div className="bg-gray-800 py-2 px-6 my-3 rounded-md text-white ">
-                {resultText}
+
+            <div className="text-gray-900 text-3xl mb-2 font-thin mt-4">
+              {blackName}
+            </div>
+
+            <div className="text-base mb-2">vs</div>
+
+            <div className="text-gray-900 text-3xl mb-4 font-thin">
+              {whiteName}
+            </div>
+
+            <div className="text-lg font-semibold text-gray-700 mt-auto">
+              <div className="text-black text-4xl bg-gray-600 p-4 rounded-md font-bold">
+                {getTimeFormattedString(myTime)}
               </div>
-            )}
+              {resultText && (
+                <div className="bg-gray-800 py-2 px-6 my-3 rounded-md text-white ">
+                  {resultText}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
+      <MainFooter />
     </div>
   );
 };
